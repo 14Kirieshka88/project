@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Крестики-Нолики (Эффект "RTX")</title>
+    <style>
+        :root {
+            --board-bg: #2c3e50; /* Темно-сине-серый */
+            --cell-bg: #34495e; /* Чуть светлее */
+            --cell-hover-bg: #4a627a;
+            --x-color: #e74c3c; /* Ярко-красный */
+            --o-color: #3498db; /* Ярко-синий */
+            --text-color: #ecf0f1; /* Светло-серый */
+            --border-color: #7f8c8d; /* Серый для линий */
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #1a1a1a 0%, #333333 100%);
+            font-family: var(--font-family);
+            color: var(--text-color);
+            overflow: hidden; /* Предотвращает появление полос прокрутки от теней */
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: rgba(0,0,0,0.2);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px var(--shadow-color), 0 0 80px rgba(var(--x-color-rgb, 231, 76, 60), 0.3), 0 0 80px rgba(var(--o-color-rgb, 52, 152, 219), 0.3);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: var(--text-color);
+            text-shadow: 0 0 10px var(--x-color), 0 0 20px var(--o-color);
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            width: 330px; /* Увеличено для более "премиального" вида */
+            height: 330px;
+            gap: 10px; /* Промежутки между ячейками */
+            background-color: var(--board-bg);
+            padding: 10px;
+            border-radius: 15px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5), 0 5px 15px var(--shadow-color);
+        }
+
+        .cell {
+            background-color: var(--cell-bg);
+            border-radius: 10px; /* Скругленные углы для ячеек */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4em; /* Размер X и O */
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3) inset, 0 1px 2px rgba(255,255,255,0.1);
+        }
+
+        .cell:hover {
+            background-color: var(--cell-hover-bg);
+            transform: scale(1.03);
+        }
+
+        .cell.x {
+            color: var(--x-color);
+            text-shadow: 0 0 8px var(--x-color), 0 0 15px var(--x-color), 0 0 3px black; /* Эффект свечения */
+        }
+
+        .cell.o {
+            color: var(--o-color);
+            text-shadow: 0 0 8px var(--o-color), 0 0 15px var(--o-color), 0 0 3px black; /* Эффект свечения */
+        }
+
+        /* Анимация появления X и O */
+        .cell.x::before, .cell.o::before {
+            opacity: 0;
+            transform: scale(0.5);
+            animation: appear 0.3s ease-out forwards;
+        }
+        .cell.x::before { content: 'X'; }
+        .cell.o::before { content: 'O'; }
+
+        @keyframes appear {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+
+        .status {
+            margin-top: 25px;
+            font-size: 1.5em;
+            min-height: 1.5em; /* Резервируем место, чтобы не прыгало */
+            text-align: center;
+        }
+
+        button#resetButton {
+            margin-top: 20px;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: var(--text-color);
+            background: linear-gradient(145deg, var(--x-color), var(--o-color));
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 8px var(--shadow-color);
+        }
+
+        button#resetButton:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 12px var(--shadow-color);
+        }
+
+        button#resetButton:active {
+            transform: translateY(0px) scale(1);
+            box-shadow: 0 2px 4px var(--shadow-color);
+        }
+
+        .audio-controls {
+            margin-top: 30px;
+        }
+        audio {
+            border-radius: 25px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 5px var(--shadow-color);
+        }
+
+        /* Анимация для фона */
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body {
+            background: linear-gradient(270deg, #1a1a1a, #2c3e50, #3498db, #e74c3c);
+            background-size: 800% 800%; /* Увеличенный размер для плавной анимации */
+            animation: gradientShift 25s ease infinite;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Крестики-Нолики</h1>
+        <div class="board" id="board">
+            </div>
+        <div class="status" id="status">Ход игрока X</div>
+        <button id="resetButton">Начать заново</button>
+
+        <div class="audio-controls">
+            <audio id="backgroundMusic" controls loop>
+                <source src="music.mp3" type="audio/mpeg">
+                Ваш браузер не поддерживает аудио элемент.
+            </audio>
+        </div>
+    </div>
+
+    <script>
+        const board = document.getElementById('board');
+        const statusDisplay = document.getElementById('status');
+        const resetButton = document.getElementById('resetButton');
+        const backgroundMusic = document.getElementById('backgroundMusic');
+
+        let currentPlayer = 'X';
+        let gameActive = true;
+        let gameState = ["", "", "", "", "", "", "", "", ""]; // 9 ячеек
+
+        const winningConditions = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], // Горизонтали
+            [0, 3, 6], [1, 4, 7], [2, 5, 8], // Вертикали
+            [0, 4, 8], [2, 4, 6]  // Диагонали
+        ];
+
+        const xColorRGB = "231, 76, 60"; // Для тени контейнера
+        const oColorRGB = "52, 152, 219"; // Для тени контейнера
+        document.documentElement.style.setProperty('--x-color-rgb', xColorRGB);
+        document.documentElement.style.setProperty('--o-color-rgb', oColorRGB);
+
+
+        function createBoard() {
+            board.innerHTML = ''; // Очищаем доску перед созданием
+            gameState = ["", "", "", "", "", "", "", "", ""];
+            currentPlayer = 'X';
+            gameActive = true;
+            statusDisplay.textContent = `Ход игрока ${currentPlayer}`;
+            statusDisplay.style.color = currentPlayer === 'X' ? 'var(--x-color)' : 'var(--o-color)';
+
+
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.dataset.index = i;
+                cell.addEventListener('click', handleCellClick);
+                board.appendChild(cell);
+            }
+        }
+
+        function handleCellClick(event) {
+            const clickedCell = event.target;
+            const clickedCellIndex = parseInt(clickedCell.dataset.index);
+
+            if (gameState[clickedCellIndex] !== "" || !gameActive) {
+                return;
+            }
+
+            gameState[clickedCellIndex] = currentPlayer;
+            // clickedCell.textContent = currentPlayer; // Заменено на ::before для анимации
+            clickedCell.classList.add(currentPlayer.toLowerCase());
+            // clickedCell.style.color = currentPlayer === 'X' ? 'var(--x-color)' : 'var(--o-color)'; // Теперь через классы
+
+            checkResult();
+        }
+
+        function checkResult() {
+            let roundWon = false;
+            for (let i = 0; i < winningConditions.length; i++) {
+                const winCondition = winningConditions[i];
+                let a = gameState[winCondition[0]];
+                let b = gameState[winCondition[1]];
+                let c = gameState[winCondition[2]];
+                if (a === '' || b === '' || c === '') {
+                    continue;
+                }
+                if (a === b && b === c) {
+                    roundWon = true;
+                    break;
+                }
+            }
+
+            if (roundWon) {
+                statusDisplay.textContent = `Игрок ${currentPlayer} победил!`;
+                statusDisplay.style.color = currentPlayer === 'X' ? 'var(--x-color)' : 'var(--o-color)';
+                gameActive = false;
+                // Попытка запустить музыку при победе (может быть заблокирована браузером)
+                // backgroundMusic.play().catch(e => console.log("Autoplay prevented: " + e));
+                return;
+            }
+
+            if (!gameState.includes("")) {
+                statusDisplay.textContent = `Ничья!`;
+                statusDisplay.style.color = 'var(--text-color)';
+                gameActive = false;
+                return;
+            }
+
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            statusDisplay.textContent = `Ход игрока ${currentPlayer}`;
+            statusDisplay.style.color = currentPlayer === 'X' ? 'var(--x-color)' : 'var(--o-color)';
+        }
+
+        resetButton.addEventListener('click', createBoard);
+
+        // Инициализация доски при загрузке
+        createBoard();
+
+        // Попытка автозапуска музыки (может быть заблокировано браузером)
+        // Для надежного автозапуска часто требуется взаимодействие пользователя со страницей.
+        // Если вы хотите, чтобы музыка играла сразу, уберите // из строки ниже,
+        // но будьте готовы, что это может не сработать во всех браузерах без клика пользователя.
+        // backgroundMusic.play().catch(e => {
+        //    console.log("Autoplay was prevented. User interaction might be needed to play music.");
+        //    // Можно добавить кнопку "Включить музыку", если автоплей не сработал.
+        // });
+    </script>
+</body>
+</html>
