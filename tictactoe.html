@@ -26,7 +26,11 @@
             --body-bg-end: var(--main-bg);
             --body-bg-direction: 135deg;
             --body-bg-size: auto; /* Используется для анимации */
-            --body-bg-animation: none; /* Используется для анимации */
+            --body-bg-animation: none; /* Используется для анимация */
+
+            /* Переменные для превью тем */
+            --preview-x-color: var(--x-color);
+            --preview-o-color: var(--o-color);
         }
 
         body {
@@ -36,7 +40,6 @@
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            /* Фон теперь управляется переменными */
             background: linear-gradient(var(--body-bg-direction), var(--body-bg-start) 0%, var(--body-bg-end) 100%);
             background-size: var(--body-bg-size); /* Для анимации */
             animation: var(--body-bg-animation); /* Для анимация */
@@ -54,19 +57,19 @@
             100% { background-position: 0% 50%; }
         }
 
-
         .screen {
             display: none; /* Скрываем все экраны по умолчанию */
             flex-direction: column;
             align-items: center;
             justify-content: center;
             width: 90%;
-            max-width: 500px;
+            max-width: 500px; /* Увеличена ширина */
             padding: 25px;
             background-color: var(--container-bg);
             border-radius: 20px;
             box-shadow: 0 20px 40px var(--shadow-color);
             text-align: center;
+            box-sizing: border-box;
         }
 
         .screen.active {
@@ -81,7 +84,7 @@
         h2 { font-size: 2em; margin-bottom: 20px; }
 
 
-        .menu-button, .back-button {
+        .menu-button, .back-button, .action-button {
             background-color: var(--button-bg);
             color: var(--text-color);
             border: none;
@@ -97,7 +100,7 @@
             text-align: center;
         }
 
-        .menu-button:hover, .back-button:hover {
+        .menu-button:hover, .back-button:hover, .action-button:hover {
             background-color: var(--button-hover-bg);
             transform: translateY(-3px);
         }
@@ -122,6 +125,7 @@
             border: 1px solid var(--border-color);
             border-radius: 8px;
             display: flex;
+            flex-direction: column; /* Для размещения номера и символа */
             align-items: center;
             justify-content: center;
             font-size: 3.5em;
@@ -129,25 +133,41 @@
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.1s ease;
             box-shadow: 0 1px 3px rgba(0,0,0,0.2) inset, 0 1px 1px rgba(255,255,255,0.05);
+            position: relative; /* Для позиционирования номера */
         }
 
         .cell:hover {
             background-color: #4b5563; /* Чуть светлее при наведении */
         }
 
-        /* Цвет и стиль символов зависят от текущей темы */
-        .cell.x { color: var(--x-color); text-shadow: 0 0 7px var(--x-color), 0 0 3px black; }
-        .cell.o { color: var(--o-color); text-shadow: 0 0 7px var(--o-color), 0 0 3px black; }
+        /* Номер на плитке */
+        .cell .cell-number {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 0.4em; /* Меньше основного символа */
+            color: rgba(255, 255, 255, 0.3); /* Полупрозрачный */
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            pointer-events: none; /* Чтобы не мешал кликам */
+        }
 
-        .cell.x::before, .cell.o::before {
+        .cell.x .cell-number,
+        .cell.o .cell-number {
+            opacity: 0; /* Скрываем номер после хода */
+        }
+
+        /* Цвет и стиль символов зависят от текущей темы */
+        .cell .player-mark {
             opacity: 0;
             transform: scale(0.5);
             animation: appear 0.3s ease-out forwards;
-            /* Содержимое символов остается X и O */
+            color: inherit; /* Цвет будет наследоваться от .x или .o */
+            text-shadow: 0 0 7px currentColor, 0 0 3px black;
         }
-        /* Здесь мы не используем ::before для символов, так как они могут быть кастомными (эмодзи, цифры).
-           Вместо этого текст будет вставляться прямо в span внутри ячейки. */
 
+        .cell.x .player-mark { color: var(--x-color); }
+        .cell.o .player-mark { color: var(--o-color); }
 
         @keyframes appear {
             to { opacity: 1; transform: scale(1); }
@@ -157,11 +177,9 @@
             margin-bottom: 15px;
             font-size: 1.4em;
             min-height: 1.4em;
-            /* Цвет статуса тоже можно менять в темах */
         }
 
-        button#resetButtonGame { /* Переименована для уникальности */
-             /* Фон кнопки с градиентом X и O - можно менять в темах */
+        button#resetButtonGame {
             background: linear-gradient(145deg, var(--x-color), var(--o-color));
             color: var(--text-color);
             border: none;
@@ -171,24 +189,12 @@
             font-weight: bold;
             margin-top:10px;
             cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease; /* Добавлен переход для фона */
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
             box-shadow: 0 4px 8px var(--shadow-color);
         }
         button#resetButtonGame:hover {
             transform: translateY(-2px) scale(1.02);
             box-shadow: 0 6px 12px var(--shadow-color);
-        }
-
-
-        .audio-controls {
-            margin-top: 20px;
-        }
-        audio {
-            border-radius: 25px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 2px 5px var(--shadow-color);
-            width: 100%;
-            max-width: 300px;
         }
 
         /* История игр */
@@ -205,38 +211,19 @@
         #historyList li {
             padding: 10px 15px;
             border-bottom: 1px solid var(--border-color);
-            background-color: #4b5563; /* Этот цвет тоже можно вынести в переменные темы */
+            background-color: #4b5563;
         }
         #historyList li:last-child {
             border-bottom: none;
         }
         #historyList li:nth-child(odd) {
-            background-color: var(--container-bg); /* Этот цвет тоже можно вынести в переменные темы */
-        }
-
-        /* Настройки - Динозавр */
-        .dino-builder {
-            font-family: monospace;
-            white-space: pre;
-            font-size: 1.2em; /* Размер дино можно подстроить */
-            line-height: 1;
-            color: #2ecc71; /* Зеленый дино */
-            margin: 20px 0;
-            padding:10px;
-            border: 2px dashed var(--border-color);
-            border-radius: 10px;
-            background-color: rgba(0,0,0,0.2);
-        }
-        .settings-message {
-            font-size: 1.3em;
-            margin-top: 10px;
-            color: #f1c40f; /* Желтый для сообщения */
+            background-color: var(--container-bg);
         }
 
         /* --- Стили для экрана Тем --- */
         #themesScreen .themes-category {
             width: 100%;
-            margin-bottom: 25px; /* Отступ между категориями */
+            margin-bottom: 25px;
         }
         #themesScreen .themes-category h3 {
             color: var(--text-color);
@@ -248,31 +235,37 @@
             width: 100%;
         }
 
+        #themesScreen .themes-category.event-themes h3 {
+            color: gold; /* Золотой цвет для эвентных тем */
+            border-color: gold;
+            text-shadow: 0 0 8px gold;
+        }
+
+
         #themesScreen .themes-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Адаптивная сетка */
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
             gap: 15px;
             width: 100%;
-            /* margin-bottom: 20px; */ /* Перемещено в .themes-category */
         }
 
         #themesScreen .themes-container { /* Новый контейнер для прокрутки */
             width: 100%;
-            max-height: 400px; /* Максимальная высота для прокрутки */
-            overflow-y: auto; /* Включаем прокрутку */
-            padding-right: 10px; /* Отступ для полосы прокрутки */
-            box-sizing: border-box; /* Учитываем padding в ширине */
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+            box-sizing: border-box;
         }
         /* Стилизация полосы прокрутки (Webkit) */
         #themesScreen .themes-container::-webkit-scrollbar {
             width: 8px;
         }
         #themesScreen .themes-container::-webkit-scrollbar-track {
-            background: #374151; /* Цвет трека */
+            background: #374151;
             border-radius: 10px;
         }
         #themesScreen .themes-container::-webkit-scrollbar-thumb {
-            background: var(--button-bg); /* Цвет ползунка */
+            background: var(--button-bg);
             border-radius: 10px;
         }
         #themesScreen .themes-container::-webkit-scrollbar-thumb:hover {
@@ -281,8 +274,8 @@
 
 
         #themesScreen .theme-option {
-            background-color: var(--main-bg); /* Фон кнопки темы */
-            border: 2px solid var(--border-color); /* Рамка */
+            background-color: var(--main-bg);
+            border: 2px solid var(--border-color);
             border-radius: 10px;
             padding: 15px;
             cursor: pointer;
@@ -293,134 +286,303 @@
             justify-content: center;
             font-size: 1em;
             font-weight: bold;
-            color: var(--text-color); /* Цвет текста названия темы */
+            color: var(--text-color);
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
         #themesScreen .theme-option:hover {
             transform: translateY(-3px);
-            border-color: var(--button-hover-bg); /* Подсветка рамки при наведении */
+            border-color: var(--button-hover-bg);
             box-shadow: 0 6px 12px rgba(0,0,0,0.3);
         }
 
          #themesScreen .theme-option.selected {
-            border-color: var(--button-bg); /* Яркая рамка для выбранной темы */
-            transform: scale(1.05); /* Немного увеличить выбранную тему */
-            box-shadow: 0 0 15px var(--button-bg), 0 0 8px var(--button-bg); /* Сияние выбранной темы */
+            border-color: var(--button-bg);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--button-bg), 0 0 8px var(--button-bg);
+        }
+
+        #themesScreen .theme-option.selected.event-theme { /* Стиль для выбранной эвентной темы */
+            border-color: gold;
+            box-shadow: 0 0 15px gold, 0 0 8px gold;
         }
 
 
         #themesScreen .theme-preview {
-            width: 60px; /* Размер превью */
+            width: 60px;
             height: 60px;
             border-radius: 8px;
             margin-bottom: 10px;
-            position: relative; /* Для позиционирования символов внутри */
-            overflow: hidden; /* Скрываем, если символы выходят за границы */
-            background-color: var(--container-bg); /* Фон превью */
-            display: flex; /* Для центрирования, если символ один */
+            position: relative;
+            overflow: hidden;
+            background-color: var(--container-bg);
+            display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5em; /* Общий размер для чисел/эмодзи */
+            font-size: 2.5em;
         }
 
         #themesScreen .theme-preview .preview-x,
         #themesScreen .theme-preview .preview-o {
-            position: absolute; /* Для позиционирования символов X и O */
-            font-size: 1.8em; /* Размер символов в превью */
+            position: absolute;
+            font-size: 1.8em;
             font-weight: bold;
             text-shadow: 0 0 4px rgba(0,0,0,0.5);
-            /* animation: appear 0.3s ease-out forwards; */ /* Анимация не нужна для превью */
         }
         #themesScreen .theme-preview .preview-x {
-            color: var(--preview-x-color); /* Цвет X для превью */
+            color: var(--preview-x-color);
             top: 5px; left: 5px;
         }
         #themesScreen .theme-preview .preview-o {
-            color: var(--preview-o-color); /* Цвет O для превью */
+            color: var(--preview-o-color);
             bottom: 5px; right: 5px;
         }
         /* Специальные стили для "скучных уроков" */
         #themesScreen .theme-preview.boring-lessons .preview-x {
-             color: black; /* Черный для карандаша */
-             font-weight: normal; /* Более тонкий шрифт */
-             opacity: 0.8; /* Полупрозрачность */
-             transform: scaleX(0.8) rotate(-45deg); /* Имитация крестика карандашом */
+             color: black;
+             font-weight: normal;
+             opacity: 0.8;
+             transform: scaleX(0.8) rotate(-45deg);
         }
         #themesScreen .theme-preview.boring-lessons .preview-o {
              color: black;
              font-weight: normal;
              opacity: 0.8;
-             transform: scale(0.9); /* Сделать чуть меньше, чтобы выглядело нарисованным */
+             transform: scale(0.9);
         }
 
-        /* Стили для текста версии */
-        #versionText {
+        /* Стили для текста версии и авторства */
+        #versionInfo {
             margin-top: 20px;
             font-size: 1em;
             color: rgba(255, 255, 255, 0.6); /* Прозрачно-беловатый */
             text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 5px; /* Отступ между строками */
         }
 
+        /* --- Стили для модальных окон --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.7);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: var(--container-bg);
+            margin: auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px; /* Увеличена ширина */
+            box-shadow: 0 10px 30px var(--shadow-color);
+            text-align: center;
+            position: relative;
+            max-height: 80vh; /* Максимальная высота для прокрутки */
+            overflow-y: auto; /* Прокрутка для контента модалки */
+            box-sizing: border-box;
+        }
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        .modal-content::-webkit-scrollbar-track {
+            background: #374151;
+            border-radius: 10px;
+        }
+        .modal-content::-webkit-scrollbar-thumb {
+            background: var(--button-bg);
+            border-radius: 10px;
+        }
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: var(--button-hover-bg);
+        }
+
+
+        .modal-content h3 {
+            color: var(--text-color);
+            margin-bottom: 25px;
+            font-size: 1.8em;
+        }
+
+        .modal-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .modal-buttons .menu-button {
+            width: 100%;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: var(--text-color);
+            font-size: 2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        .close-button:hover {
+            color: var(--button-hover-bg);
+        }
+
+        /* Стили для выбора языка в настройках */
+        .language-option {
+            display: block; /* Каждая опция на новой строке */
+            width: 100%;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            background-color: #4b5563;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+            text-align: left;
+        }
+        .language-option:hover {
+            background-color: #606b7a;
+            border-color: var(--button-bg);
+        }
+        .language-option.selected-lang {
+            background-color: var(--button-bg);
+            border-color: var(--button-hover-bg);
+            font-weight: bold;
+        }
+        .language-options-container { /* Для прокрутки языков в настройках */
+            max-height: 250px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        .language-options-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .language-options-container::-webkit-scrollbar-track {
+            background: #374151;
+            border-radius: 10px;
+        }
+        .language-options-container::-webkit-scrollbar-thumb {
+            background: var(--button-bg);
+            border-radius: 10px;
+        }
+        .language-options-container::-webkit-scrollbar-thumb:hover {
+            background: var(--button-hover-bg);
+        }
     </style>
 </head>
 <body>
 
     <div id="mainMenuScreen" class="screen active">
         <h1>Крестики-Нолики Deluxe</h1>
-        <button class="menu-button" onclick="showScreen('gameScreen'); startGame();">Играть</button>
-        <button class="menu-button" onclick="showScreen('historyScreen'); loadHistory();">История игр</button>
-        <button class="menu-button" onclick="showScreen('themesScreen')">Темы</button>
-        <button class="menu-button" onclick="showScreen('settingsScreen')">Настройки</button>
-        <p id="versionText">Version: 1</p>
+        <button class="menu-button" id="playButton" onclick="showScreen('gameScreen');">Играть</button>
+        <button class="menu-button" id="historyButton" onclick="showScreen('historyScreen'); loadHistory();">История игр</button>
+        <button class="menu-button" id="themesButton" onclick="showScreen('themesScreen')">Темы</button>
+        <button class="menu-button" id="settingsButton" onclick="showScreen('settingsScreen')">Настройки</button>
+        <div id="versionInfo">
+            <p><span id="versionText">Version: 1</span></p>
+            <p><span id="gameByText">Game by </span>Luckymodd</p>
+        </div>
     </div>
 
     <div id="gameScreen" class="screen">
-        <h2>Крестики-Нолики</h2>
+        <h2 id="gameTitle">Крестики-Нолики</h2>
         <div class="status" id="status">Ход игрока X</div>
         <div class="board" id="board">
             </div>
         <button id="resetButtonGame">Начать заново</button>
-        <button class="back-button" onclick="showScreen('mainMenuScreen')">В меню</button>
+        <button class="back-button" id="backToMenuGame" onclick="showScreen('mainMenuScreen', true)">В меню</button>
     </div>
 
     <div id="historyScreen" class="screen">
-        <h2>История побед</h2>
+        <h2 id="historyTitle">История побед</h2>
         <ul id="historyList">
             </ul>
-        <button class="back-button" onclick="showScreen('mainMenuScreen')">В меню</button>
+        <div style="display: flex; gap: 10px;">
+            <button class="action-button" id="clearHistoryButton" style="width: auto;">Очистить историю</button>
+            <button class="back-button" id="backToMenuHistory" onclick="showScreen('mainMenuScreen')" style="width: auto;">В меню</button>
+        </div>
     </div>
 
     <div id="settingsScreen" class="screen">
-        <h2>Настройки</h2>
-        <div class="dino-builder">
-          /\_/\
-         / o o \
-        (  (_Y_)  )
-         \ \   / / Я строитель!
-          \ '-' /  []--[]
-           '---'  [][][]
+        <h2 id="settingsTitle">Настройки</h2>
+        
+        <h3><span id="languageSettingsTitle">Язык:</span> <span id="currentLanguageDisplay">Русский</span></h3>
+        <div class="language-options-container" id="languageOptionsContainer">
+            </div>
+
+        <button class="menu-button" id="supportButton" style="width: auto; padding: 15px 40px; margin-top: 20px;">Написать в поддержку</button>
+
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button class="action-button" id="applySettingsButton" style="width: auto;">Применить</button>
+            <button class="back-button" id="backToMenuSettings" onclick="confirmCancelSettings()">В меню</button>
         </div>
-        <p class="settings-message">Простите, я случайно все сломал... <br>(Настройки в разработке!)</p>
-        <button class="back-button" onclick="showScreen('mainMenuScreen')">В меню</button>
     </div>
 
     <div id="themesScreen" class="screen">
-        <h2>Выбор Темы</h2>
-        <div class="themes-container"> <div id="ordinaryThemes" class="themes-category">
-                <h3>Обычные</h3>
+        <h2 id="themesTitle">Выбор Темы</h2>
+        <div class="themes-container">
+            <div id="eventThemes" class="themes-category event-themes">
+                <h3 id="eventThemesTitle">Эвентные</h3>
+                <div class="themes-grid">
+                    </div>
+            </div>
+            <div id="ordinaryThemes" class="themes-category">
+                <h3 id="ordinaryThemesTitle">Обычные</h3>
                 <div class="themes-grid">
                     </div>
             </div>
 
             <div id="specialThemes" class="themes-category">
-                <h3>Особые</h3>
+                <h3 id="specialThemesTitle">Особые</h3>
                 <div class="themes-grid">
                     </div>
             </div>
         </div>
-        <button class="back-button" onclick="showScreen('mainMenuScreen')">В меню</button>
+        <button class="back-button" id="backToMenuThemes" onclick="showScreen('mainMenuScreen')">В меню</button>
     </div>
+
+    <div id="languageModal" class="modal">
+        <div class="modal-content">
+            <h3 id="languageModalTitle"></h3>
+            <div class="language-options-container" id="firstTimeLanguageOptions">
+                </div>
+        </div>
+    </div>
+
+    <div id="clearHistoryConfirmModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('clearHistoryConfirmModal')">&times;</span>
+            <h3 id="clearHistoryConfirmTitle">Вы уверены, что хотите очистить историю?</h3>
+            <div class="modal-buttons">
+                <button class="menu-button" id="confirmClearHistoryButton"></button>
+                <button class="back-button" onclick="closeModal('clearHistoryConfirmModal')"></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="cancelSettingsConfirmModal" class="modal">
+        <div class="modal-content">
+            <h3 id="cancelSettingsConfirmTitle"></h3>
+            <div class="modal-buttons">
+                <button class="menu-button" id="cancelSettingsStayButton"></button>
+                <button class="back-button" id="cancelSettingsDiscardButton"></button>
+            </div>
+        </div>
+    </div>
+
 
     <script>
         // Элементы DOM
@@ -428,11 +590,29 @@
         const boardElement = document.getElementById('board');
         const statusDisplay = document.getElementById('status');
         const resetButtonGame = document.getElementById('resetButtonGame');
-        // const backgroundMusic = document.getElementById('backgroundMusic'); // Удален
         const historyListElement = document.getElementById('historyList');
-        const ordinaryThemesGridElement = document.querySelector('#ordinaryThemes .themes-grid'); // Элемент для обычных тем
-        const specialThemesGridElement = document.querySelector('#specialThemes .themes-grid'); // Элемент для особых тем
-        const root = document.documentElement; // Доступ к CSS переменным
+        const ordinaryThemesGridElement = document.querySelector('#ordinaryThemes .themes-grid');
+        const specialThemesGridElement = document.querySelector('#specialThemes .themes-grid');
+        const eventThemesGridElement = document.querySelector('#eventThemes .themes-grid');
+        const root = document.documentElement;
+
+        const languageModal = document.getElementById('languageModal');
+        const languageModalTitle = document.getElementById('languageModalTitle');
+        const firstTimeLanguageOptions = document.getElementById('firstTimeLanguageOptions');
+
+        const settingsLanguageOptionsContainer = document.getElementById('languageOptionsContainer');
+        const currentLanguageDisplay = document.getElementById('currentLanguageDisplay');
+        const applySettingsButton = document.getElementById('applySettingsButton');
+        const supportButton = document.getElementById('supportButton');
+
+        const clearHistoryButton = document.getElementById('clearHistoryButton');
+        const clearHistoryConfirmModal = document.getElementById('clearHistoryConfirmModal');
+        const confirmClearHistoryButton = document.getElementById('confirmClearHistoryButton');
+
+        const cancelSettingsConfirmModal = document.getElementById('cancelSettingsConfirmModal');
+        const cancelSettingsStayButton = document.getElementById('cancelSettingsStayButton');
+        const cancelSettingsDiscardButton = document.getElementById('cancelSettingsDiscardButton');
+
 
         // Состояние игры
         let currentPlayer = 'X';
@@ -447,10 +627,262 @@
             [0, 4, 8], [2, 4, 6]
         ];
 
+        // --- Локализация ---
+        const translations = {
+            'ru': {
+                'play': 'Играть',
+                'history': 'История игр',
+                'themes': 'Темы',
+                'settings': 'Настройки',
+                'game_title': 'Крестики-Нолики',
+                'turn_x': 'Ход игрока X',
+                'turn_o': 'Ход игрока O',
+                'player_x_wins': 'Игрок X победил за',
+                'player_o_wins': 'Игрок O победил за',
+                'draw': 'Ничья за',
+                'seconds': 'сек!',
+                'start_new': 'Начать заново',
+                'back_to_menu': 'В меню',
+                'history_title': 'История побед',
+                'history_empty': 'История пока пуста. Сыграйте партию!',
+                'clear_history': 'Очистить историю',
+                'confirm_clear_history': 'Вы уверены, что хотите очистить историю?',
+                'yes_clear': 'Да, очистить',
+                'cancel': 'Отмена',
+                'themes_title': 'Выбор Темы',
+                'event_themes': 'Эвентные',
+                'ordinary_themes': 'Обычные',
+                'special_themes': 'Особые',
+                'settings_title': 'Настройки',
+                'select_your_language': 'Выберите свой язык',
+                'language': 'Язык:',
+                'write_to_support': 'Написать в поддержку',
+                'apply': 'Применить',
+                'confirm_cancel_settings': 'Вы действительно хотите отменить несохраненные изменения?',
+                'discard': 'Отменить',
+                'game_by': 'Игра от',
+                'theme_default': 'По Умолчанию',
+                'theme_forest': 'Лес',
+                'theme_ocean': 'Океан',
+                'theme_lava': 'Лава',
+                'theme_excellent_poor': 'Отличник vs Двоечник',
+                'theme_stars_moon': 'Звезды и Луна',
+                'theme_stars_moon_emoji': 'Звезды и Луна (Эмодзи)',
+                'theme_boring_lessons': 'Скучные Уроки',
+                'theme_water_vs_lava': 'Вода vs Лава',
+                'theme_summer_emoji': 'Лето в эмодзи'
+            },
+            'en': {
+                'play': 'Play',
+                'history': 'Game History',
+                'themes': 'Themes',
+                'settings': 'Settings',
+                'game_title': 'Tic-Tac-Toe',
+                'turn_x': 'X\'s Turn',
+                'turn_o': 'O\'s Turn',
+                'player_x_wins': 'Player X won in',
+                'player_o_wins': 'Player O won in',
+                'draw': 'Draw in',
+                'seconds': 'sec!',
+                'start_new': 'Start New Game',
+                'back_to_menu': 'Back to Menu',
+                'history_title': 'Win History',
+                'history_empty': 'History is empty. Play a game!',
+                'clear_history': 'Clear History',
+                'confirm_clear_history': 'Are you sure you want to clear history?',
+                'yes_clear': 'Yes, clear',
+                'cancel': 'Cancel',
+                'themes_title': 'Choose Theme',
+                'event_themes': 'Event Themes',
+                'ordinary_themes': 'Ordinary',
+                'special_themes': 'Special',
+                'settings_title': 'Settings',
+                'select_your_language': 'Select your language',
+                'language': 'Language:',
+                'write_to_support': 'Write to support',
+                'apply': 'Apply',
+                'confirm_cancel_settings': 'Do you really want to discard unsaved changes?',
+                'discard': 'Discard',
+                'game_by': 'Game by',
+                'theme_default': 'Default',
+                'theme_forest': 'Forest',
+                'theme_ocean': 'Ocean',
+                'theme_lava': 'Lava',
+                'theme_excellent_poor': 'A-Student vs F-Student',
+                'theme_stars_moon': 'Stars and Moon',
+                'theme_stars_moon_emoji': 'Stars and Moon (Emoji)',
+                'theme_boring_lessons': 'Boring Lessons',
+                'theme_water_vs_lava': 'Water vs Lava',
+                'theme_summer_emoji': 'Summer in Emoji'
+            },
+            'es': {
+                'play': 'Jugar',
+                'history': 'Historial de Juegos',
+                'themes': 'Temas',
+                'settings': 'Configuración',
+                'game_title': 'Tres en Raya',
+                'turn_x': 'Turno de X',
+                'turn_o': 'Turno de O',
+                'player_x_wins': 'El jugador X ganó en',
+                'player_o_wins': 'El jugador O ganó en',
+                'draw': 'Empate en',
+                'seconds': 'seg!',
+                'start_new': 'Empezar de Nuevo',
+                'back_to_menu': 'Volver al Menú',
+                'history_title': 'Historial de Victorias',
+                'history_empty': 'Historial vacío. ¡Juega una partida!',
+                'clear_history': 'Borrar Historial',
+                'confirm_clear_history': '¿Seguro que quieres borrar el historial?',
+                'yes_clear': 'Sí, borrar',
+                'cancel': 'Cancelar',
+                'themes_title': 'Elegir Tema',
+                'event_themes': 'Temas de Evento',
+                'ordinary_themes': 'Ordinarios',
+                'special_themes': 'Especiales',
+                'settings_title': 'Configuración',
+                'select_your_language': 'Selecciona tu idioma',
+                'language': 'Idioma:',
+                'write_to_support': 'Escribir a soporte',
+                'apply': 'Aplicar',
+                'confirm_cancel_settings': '¿Realmente quieres descartar los cambios no guardados?',
+                'discard': 'Descartar',
+                'game_by': 'Juego por',
+                'theme_default': 'Por Defecto',
+                'theme_forest': 'Bosque',
+                'theme_ocean': 'Océano',
+                'theme_lava': 'Lava',
+                'theme_excellent_poor': 'Estudiante A vs Estudiante F',
+                'theme_stars_moon': 'Estrellas y Luna',
+                'theme_stars_moon_emoji': 'Estrellas y Luna (Emoji)',
+                'theme_boring_lessons': 'Clases Aburridas',
+                'theme_water_vs_lava': 'Agua vs Lava',
+                'theme_summer_emoji': 'Verano en Emoji'
+            },
+            'pt': {
+                'play': 'Jogar',
+                'history': 'Histórico de Jogos',
+                'themes': 'Temas',
+                'settings': 'Configurações',
+                'game_title': 'Jogo da Velha',
+                'turn_x': 'Vez de X',
+                'turn_o': 'Vez de O',
+                'player_x_wins': 'Jogador X venceu em',
+                'player_o_wins': 'Jogador O venceu em',
+                'draw': 'Empate em',
+                'seconds': 'seg!',
+                'start_new': 'Começar Novo Jogo',
+                'back_to_menu': 'Voltar ao Menu',
+                'history_title': 'Histórico de Vitórias',
+                'history_empty': 'Histórico vazio. Jogue uma partida!',
+                'clear_history': 'Limpar Histórico',
+                'confirm_clear_history': 'Tem certeza de que deseja limpar o histórico?',
+                'yes_clear': 'Sim, limpar',
+                'cancel': 'Cancelar',
+                'themes_title': 'Escolher Tema',
+                'event_themes': 'Temas de Evento',
+                'ordinary_themes': 'Ordinários',
+                'special_themes': 'Especiais',
+                'settings_title': 'Configurações',
+                'select_your_language': 'Selecione seu idioma',
+                'language': 'Idioma:',
+                'write_to_support': 'Escrever para suporte',
+                'apply': 'Aplicar',
+                'confirm_cancel_settings': 'Deseja realmente descartar as alterações não salvas?',
+                'discard': 'Descartar',
+                'game_by': 'Jogo por',
+                'theme_default': 'Padrão',
+                'theme_forest': 'Floresta',
+                'theme_ocean': 'Oceano',
+                'theme_lava': 'Lava',
+                'theme_excellent_poor': 'Aluno A vs Aluno F',
+                'theme_stars_moon': 'Estrelas e Lua',
+                'theme_stars_moon_emoji': 'Estrelas e Lua (Emoji)',
+                'theme_boring_lessons': 'Aulas Chatas',
+                'theme_water_vs_lava': 'Água vs Lava',
+                'theme_summer_emoji': 'Verão em Emoji'
+            },
+            'it': {
+                'play': 'Gioca',
+                'history': 'Cronologia Partite',
+                'themes': 'Temi',
+                'settings': 'Impostazioni',
+                'game_title': 'Tris',
+                'turn_x': 'Turno di X',
+                'turn_o': 'Turno di O',
+                'player_x_wins': 'Giocatore X ha vinto in',
+                'player_o_wins': 'Giocatore O ha vinto in',
+                'draw': 'Pareggio in',
+                'seconds': 'sec!',
+                'start_new': 'Inizia Nuova Partita',
+                'back_to_menu': 'Torna al Menu',
+                'history_title': 'Cronologia Vittorie',
+                'history_empty': 'Cronologia vuota. Gioca una partita!',
+                'clear_history': 'Cancella Cronologia',
+                'confirm_clear_history': 'Sei sicuro di voler cancellare la cronologia?',
+                'yes_clear': 'Sì, cancella',
+                'cancel': 'Annulla',
+                'themes_title': 'Scegli Tema',
+                'event_themes': 'Temi Evento',
+                'ordinary_themes': 'Ordinari',
+                'special_themes': 'Speciali',
+                'settings_title': 'Impostazioni',
+                'select_your_language': 'Seleziona la tua lingua',
+                'language': 'Lingua:',
+                'write_to_support': 'Scrivi al supporto',
+                'apply': 'Applica',
+                'confirm_cancel_settings': 'Vuoi davvero scartare le modifiche non salvate?',
+                'discard': 'Scarta',
+                'game_by': 'Gioco di',
+                'theme_default': 'Predefinito',
+                'theme_forest': 'Foresta',
+                'theme_ocean': 'Oceano',
+                'theme_lava': 'Lava',
+                'theme_excellent_poor': 'Studente A vs Studente F',
+                'theme_stars_moon': 'Stelle e Luna',
+                'theme_stars_moon_emoji': 'Stelle e Luna (Emoji)',
+                'theme_boring_lessons': 'Lezioni noiose',
+                'theme_water_vs_lava': 'Acqua vs Lava',
+                'theme_summer_emoji': 'Estate in Emoji'
+            }
+        };
+
+        const languageNames = {
+            'ru': 'Русский',
+            'en': 'English',
+            'es': 'Español',
+            'pt': 'Português',
+            'it': 'Italiano'
+        };
+
+        let currentLanguage = localStorage.getItem('ticTacToeLanguage') || 'en';
+        let tempSettingsLanguage = currentLanguage;
+
          // --- Определение Тем ---
          const themes = {
+             'summer-emoji': {
+                 nameKey: 'theme_summer_emoji', // Ключ для перевода
+                 category: 'event',
+                 vars: {
+                    '--main-bg': '#add8e6',
+                    '--container-bg': '#87ceeb',
+                    '--button-bg': 'linear-gradient(90deg, #4682b4, #ffd700)',
+                    '--button-hover-bg': 'linear-gradient(90deg, #5b9bd5, #ffe400)',
+                    '--x-color': '#0056b3',
+                    '--o-color': '#ffbe0b',
+                    '--text-color': '#333333',
+                    '--border-color': '#60a5fa',
+                    '--shadow-color': 'rgba(0, 0, 0, 0.3)',
+                    '--body-bg-start': '#87ceeb',
+                    '--body-bg-end': '#ffd700',
+                    '--body-bg-direction': '45deg',
+                    '--body-bg-size': '200% 200%',
+                    '--body-bg-animation': 'gradientShift 15s ease infinite alternate',
+                 },
+                 marks: { x: '🌧️', o: '☀️' },
+                 preview: { '--preview-x-color': '#0056b3', '--preview-o-color': '#ffbe0b' }
+             },
              'default': {
-                 name: 'По Умолчанию',
+                 nameKey: 'theme_default',
                  category: 'ordinary',
                  vars: {
                     '--main-bg': '#1f2937',
@@ -468,23 +900,23 @@
                     '--body-bg-size': 'auto',
                     '--body-bg-animation': 'none',
                  },
-                 marks: { x: 'X', o: 'O' }, // Используем для кастомных символов
+                 marks: { x: 'X', o: 'O' },
                  preview: { '--preview-x-color': '#ef4444', '--preview-o-color': '#3b82f6' }
              },
              'forest': {
-                 name: 'Лес',
+                 nameKey: 'theme_forest',
                  category: 'ordinary',
                  vars: {
-                    '--main-bg': '#1e3a24', /* Темно-зеленый */
-                    '--container-bg': '#224d2b', /* Средне-зеленый */
-                    '--button-bg': '#346c41', /* Зеленая кнопка */
+                    '--main-bg': '#1e3a24',
+                    '--container-bg': '#224d2b',
+                    '--button-bg': '#346c41',
                     '--button-hover-bg': '#4a805a',
-                    '--x-color': '#facc15', /* Золотистый */
-                    '--o-color': '#a7f3d0', /* Светло-зеленый */
-                    '--text-color': '#d1fae5', /* Очень светло-зеленый */
-                    '--border-color': '#4b5563', /* Серый */
+                    '--x-color': '#facc15',
+                    '--o-color': '#a7f3d0',
+                    '--text-color': '#d1fae5',
+                    '--border-color': '#4b5563',
                     '--shadow-color': 'rgba(0, 0, 0, 0.6)',
-                    '--body-bg-start': '#064e3b', /* Темно-изумрудный */
+                    '--body-bg-start': '#064e3b',
                     '--body-bg-end': '#1e3a24',
                     '--body-bg-direction': 'top right',
                     '--body-bg-size': 'auto',
@@ -494,19 +926,19 @@
                  preview: { '--preview-x-color': '#facc15', '--preview-o-color': '#a7f3d0' }
              },
              'ocean': {
-                 name: 'Океан',
+                 nameKey: 'theme_ocean',
                  category: 'ordinary',
                  vars: {
-                    '--main-bg': '#1e3a8a', /* Темно-синий */
-                    '--container-bg': '#1c4a7b', /* Средне-синий */
-                    '--button-bg': '#2563eb', /* Голубая кнопка */
+                    '--main-bg': '#1e3a8a',
+                    '--container-bg': '#1c4a7b',
+                    '--button-bg': '#2563eb',
                     '--button-hover-bg': '#3b82f6',
-                    '--x-color': '#f87171', /* Коралл */
-                    '--o-color': '#bfdbfe', /* Очень светло-голубой */
-                    '--text-color': '#eff6ff', /* Почти белый */
-                    '--border-color': '#60a5fa', /* Светло-синий */
+                    '--x-color': '#f87171',
+                    '--o-color': '#bfdbfe',
+                    '--text-color': '#eff6ff',
+                    '--border-color': '#60a5fa',
                     '--shadow-color': 'rgba(0, 0, 0, 0.6)',
-                    '--body-bg-start': '#0b173b', /* Очень темно-синий */
+                    '--body-bg-start': '#0b173b',
                     '--body-bg-end': '#1e3a8a',
                     '--body-bg-direction': 'bottom left',
                     '--body-bg-size': 'auto',
@@ -516,82 +948,57 @@
                  preview: { '--preview-x-color': '#f87171', '--preview-o-color': '#bfdbfe' }
              },
               'lava': {
-                 name: 'Лава',
+                 nameKey: 'theme_lava',
                  category: 'ordinary',
                  vars: {
-                    '--main-bg': '#450a0a', /* Темно-бордовый */
-                    '--container-bg': '#7f1d1d', /* Красно-коричневый */
-                    '--button-bg': '#dc2626', /* Красная кнопка */
+                    '--main-bg': '#450a0a',
+                    '--container-bg': '#7f1d1d',
+                    '--button-bg': '#dc2626',
                     '--button-hover-bg': '#ef4444',
-                    '--x-color': '#fef08a', /* Очень светло-желтый */
-                    '--o-color': '#f97316', /* Оранжевый */
-                    '--text-color': '#fef2f2', /* Почти белый */
-                    '--border-color': '#b91c1c', /* Темно-красный */
+                    '--x-color': '#fef08a',
+                    '--o-color': '#f97316',
+                    '--text-color': '#fef2f2',
+                    '--border-color': '#b91c1c',
                     '--shadow-color': 'rgba(0, 0, 0, 0.8)',
-                    '--body-bg-start': '#0c0606', /* Почти черный */
+                    '--body-bg-start': '#0c0606',
                     '--body-bg-end': '#450a0a',
                     '--body-bg-direction': 'to top',
-                    '--body-bg-size': '600% 600%', /* Увеличиваем размер для анимации */
-                    '--body-bg-animation': 'gradientShift 30s ease infinite', /* Включаем анимацию для этой темы */
+                    '--body-bg-size': '600% 600%',
+                    '--body-bg-animation': 'gradientShift 30s ease infinite',
                  },
                  marks: { x: 'X', o: 'O' },
                  preview: { '--preview-x-color': '#fef08a', '--preview-o-color': '#f97316' }
              },
-             'excellent-poor': { // Новая тема: Отличник против двоечника
-                 name: 'Отличник vs Двоечник',
+             'excellent-poor': {
+                 nameKey: 'theme_excellent_poor',
                  category: 'special',
                  vars: {
-                    '--main-bg': '#ffffff', /* Временно белый фон */
+                    '--main-bg': '#ffffff',
                     '--container-bg': '#f0f0f0',
-                    '--button-bg': '#4CAF50', /* Зеленая кнопка */
+                    '--button-bg': '#4CAF50',
                     '--button-hover-bg': '#66BB6A',
-                    '--x-color': '#ef4444', /* Красная */
-                    '--o-color': '#3b82f6', /* Синяя */
-                    '--text-color': '#333333', /* Темный текст на светлом фоне */
+                    '--x-color': '#ef4444',
+                    '--o-color': '#3b82f6',
+                    '--text-color': '#333333',
                     '--border-color': '#cccccc',
                     '--shadow-color': 'rgba(0, 0, 0, 0.2)',
-                    '--body-bg-start': '#ffffff', /* Временно белый фон */
+                    '--body-bg-start': '#ffffff',
                     '--body-bg-end': '#f0f0f0',
                     '--body-bg-direction': '135deg',
                     '--body-bg-size': 'auto',
                     '--body-bg-animation': 'none',
                  },
-                 marks: { x: '2', o: '5' }, // Символы 2 и 5
+                 marks: { x: '2', o: '5' },
                  preview: { '--preview-x-color': '#ef4444', '--preview-o-color': '#3b82f6' }
              },
              'stars-moon': {
-                 name: 'Звезды и Луна',
-                 category: 'special', // Эта тема теперь особая
-                 vars: {
-                    '--main-bg': '#0a0a23', /* Очень темный синий/черный */
-                    '--container-bg': '#1a1a3b', /* Темно-фиолетовый */
-                    '--button-bg': '#3a245c', /* Темно-фиолетовый */
-                    '--button-hover-bg': '#5a3b8d', /* Чуть светлее фиолетовый */
-                    '--x-color': '#ffffa0', /* Светло-желтый (цвет звезды) */
-                    '--o-color': '#f0f0f0', /* Белый/очень светло-серый (цвет луны) */
-                    '--text-color': '#e0e0ff', /* Светло-голубой/фиолетовый */
-                    '--border-color': '#404060', /* Темно-серый/синий */
-                    '--shadow-color': 'rgba(0, 0, 0, 0.8)',
-                    '--body-bg-start': '#000000', /* Черный космос */
-                    '--body-bg-end': '#1a1a3b',
-                    '--body-bg-direction': 'to bottom right',
-                    '--body-bg-size': 'auto',
-                    '--body-bg-animation': 'none', /* Без анимации фона по умолчанию */
-                 },
-                 marks: { x: 'X', o: 'O' }, // Используем X и O по умолчанию
-                 preview: { '--preview-x-color': '#ffffa0', '--preview-o-color': '#f0f0f0' }
-             },
-             'stars-moon-emoji': { // Новая тема: Звезды и Луна Эмодзи версия
-                 name: 'Звезды и Луна (Эмодзи)',
+                 nameKey: 'theme_stars_moon',
                  category: 'special',
                  vars: {
-                    // Используем те же переменные, что и у обычной темы "Звезды и Луна"
                     '--main-bg': '#0a0a23',
                     '--container-bg': '#1a1a3b',
                     '--button-bg': '#3a245c',
                     '--button-hover-bg': '#5a3b8d',
-                    // Цвета X и O здесь не так важны, так как это эмодзи,
-                    // но они могут использоваться для статуса
                     '--x-color': '#ffffa0',
                     '--o-color': '#f0f0f0',
                     '--text-color': '#e0e0ff',
@@ -603,49 +1010,71 @@
                     '--body-bg-size': 'auto',
                     '--body-bg-animation': 'none',
                  },
-                 marks: { x: '⭐', o: '🌕' }, // Эмодзи звезды и полной луны
+                 marks: { x: 'X', o: 'O' },
                  preview: { '--preview-x-color': '#ffffa0', '--preview-o-color': '#f0f0f0' }
              },
-             'boring-lessons': { // Новая тема: Скучные уроки
-                 name: 'Скучные Уроки',
+             'stars-moon-emoji': {
+                 nameKey: 'theme_stars_moon_emoji',
+                 category: 'special',
+                 vars: {
+                    '--main-bg': '#0a0a23',
+                    '--container-bg': '#1a1a3b',
+                    '--button-bg': '#3a245c',
+                    '--button-hover-bg': '#5a3b8d',
+                    '--x-color': '#ffffa0',
+                    '--o-color': '#f0f0f0',
+                    '--text-color': '#e0e0ff',
+                    '--border-color': '#404060',
+                    '--shadow-color': 'rgba(0, 0, 0, 0.8)',
+                    '--body-bg-start': '#000000',
+                    '--body-bg-end': '#1a1a3b',
+                    '--body-bg-direction': 'to bottom right',
+                    '--body-bg-size': 'auto',
+                    '--body-bg-animation': 'none',
+                 },
+                 marks: { x: '⭐', o: '🌕' },
+                 preview: { '--preview-x-color': '#ffffa0', '--preview-o-color': '#f0f0f0' }
+             },
+             'boring-lessons': {
+                 nameKey: 'theme_boring_lessons',
                  category: 'ordinary',
                  vars: {
-                    '--main-bg': '#ffffff', /* Временно белый фон */
+                    '--main-bg': '#ffffff',
                     '--container-bg': '#f0f0f0',
-                    '--button-bg': '#6b7280', /* Серый как карандаш */
+                    '--button-bg': '#6b7280',
                     '--button-hover-bg': '#9ca3af',
-                    '--x-color': 'black', /* Черный для карандаша */
-                    '--o-color': 'black', /* Черный для карандаша */
+                    '--x-color': 'black',
+                    '--o-color': 'black',
                     '--text-color': '#333333',
                     '--border-color': '#cccccc',
                     '--shadow-color': 'rgba(0, 0, 0, 0.2)',
-                    '--body-bg-start': '#ffffff', /* Временно белый фон */
+                    '--body-bg-start': '#ffffff',
                     '--body-bg-end': '#f0f0f0',
                     '--body-bg-direction': '135deg',
                     '--body-bg-size': 'auto',
                     '--body-bg-animation': 'none',
                  },
-                 marks: { x: 'X', o: 'O' }, // Здесь стилизация будет через CSS для имитации карандаша
+                 marks: { x: 'X', o: 'O' },
                  preview: { '--preview-x-color': 'black', '--preview-o-color': 'black' }
              },
-             'water-vs-lava': { // Новая тема: Вода против Лавы
-                 name: 'Вода vs Лава',
+             'water-vs-lava': {
+                 nameKey: 'theme_water_vs_lava',
                  category: 'ordinary',
                  vars: {
-                    '--main-bg': '#ff4500', /* Начальный оранжевый */
-                    '--container-bg': '#4169e1', /* Синий */
+                    '--main-bg': '#ff4500',
+                    '--container-bg': '#4169e1',
                     '--button-bg': 'linear-gradient(90deg, #ff4500, #4169e1)',
                     '--button-hover-bg': 'linear-gradient(90deg, #ff6347, #6a5acd)',
-                    '--x-color': '#ff4500', /* Оранжевый */
-                    '--o-color': '#4169e1', /* Синий */
+                    '--x-color': '#ff4500',
+                    '--o-color': '#4169e1',
                     '--text-color': '#f3f4f6',
                     '--border-color': '#808080',
                     '--shadow-color': 'rgba(0, 0, 0, 0.6)',
-                    '--body-bg-start': '#ff4500', /* Оранжевый */
-                    '--body-bg-end': '#4169e1', /* Синий */
-                    '--body-bg-direction': '45deg', /* Направление градиента */
-                    '--body-bg-size': '200% 200%', /* Увеличиваем для плавного перелива */
-                    '--body-bg-animation': 'gradientShift 20s ease infinite alternate', /* Анимация перелива */
+                    '--body-bg-start': '#ff4500',
+                    '--body-bg-end': '#4169e1',
+                    '--body-bg-direction': '45deg',
+                    '--body-bg-size': '200% 200%',
+                    '--body-bg-animation': 'gradientShift 20s ease infinite alternate',
                  },
                  marks: { x: 'X', o: 'O' },
                  preview: { '--preview-x-color': '#ff4500', '--preview-o-color': '#4169e1' }
@@ -656,12 +1085,38 @@
 
 
         // --- Управление экранами ---
-        function showScreen(screenId) {
+        // Добавлен параметр resetGame для принудительного сброса игры
+        function showScreen(screenId, resetGame = false) {
             screens.forEach(screen => {
                 screen.classList.remove('active');
             });
             document.getElementById(screenId).classList.add('active');
-            // Музыка больше не управляется напрямую отсюда
+
+            // Сброс игры при переходе на другие экраны
+            if (screenId !== 'gameScreen' && document.getElementById('gameScreen').classList.contains('active')) {
+                startGame(); // Сбрасываем игру, если уходим с игрового экрана
+            }
+
+            // Если переходим на экран настроек, обновляем список языков
+            if (screenId === 'settingsScreen') {
+                populateLanguageOptions(settingsLanguageOptionsContainer, tempSettingsLanguage, (lang) => {
+                    tempSettingsLanguage = lang;
+                    currentLanguageDisplay.textContent = languageNames[tempSettingsLanguage];
+                });
+            }
+            if (screenId === 'themesScreen') {
+                 populateThemesGrid();
+            }
+            if (screenId === 'gameScreen' && resetGame) { // Если явно запрошен сброс игры
+                startGame();
+            } else if (screenId === 'gameScreen') { // Если просто зашли на gameScreen без явного сброса
+                // Проверяем, если игра не активна (например, после победы/ничьей или перезагрузки)
+                // то начинаем новую игру. Это решает баг с пустыми плитками при обновлении.
+                if (!gameActive || gameState.every(cell => cell === "")) {
+                     startGame();
+                }
+            }
+            updateTextContent(); // Обновляем текст при смене экрана
         }
 
         // --- Логика игры ---
@@ -670,8 +1125,7 @@
             gameState = ["", "", "", "", "", "", "", "", ""];
             currentPlayer = 'X';
             gameActive = true;
-            statusDisplay.textContent = `Ход игрока ${currentPlayer}`;
-             // Обновляем цвет статуса в зависимости от текущей темы и игрока
+            statusDisplay.textContent = `${translations[currentLanguage].turn_x}`;
             statusDisplay.style.color = root.style.getPropertyValue(currentPlayer === 'X' ? '--x-color' : '--o-color');
 
             gameStartTime = new Date();
@@ -680,34 +1134,61 @@
                 const cell = document.createElement('div');
                 cell.classList.add('cell');
                 cell.dataset.index = i;
+                cell.dataset.cellNumber = i + 1; // Добавляем номер ячейки
                 cell.addEventListener('click', handleCellClick);
+
+                const playerMarkSpan = document.createElement('span');
+                playerMarkSpan.classList.add('player-mark');
+                // playerMarkSpan.textContent будет установлен в handleCellClick
+
+                const cellNumberSpan = document.createElement('span');
+                cellNumberSpan.classList.add('cell-number');
+                cellNumberSpan.textContent = i + 1; // Номер для отображения
+                
+                cell.appendChild(playerMarkSpan);
+                cell.appendChild(cellNumberSpan); // Добавляем номер в ячейку
+                
                 boardElement.appendChild(cell);
             }
-             // Музыка больше не воспроизводится при старте игры
+            // Переприменяем тему, чтобы символы были правильными
+            applyTheme(currentThemeKey);
         }
 
         function handleCellClick(event) {
-            const clickedCell = event.target;
+            const clickedCell = event.target.closest('.cell'); // Убедимся, что клик был по ячейке
+            if (!clickedCell) return;
+
             const clickedCellIndex = parseInt(clickedCell.dataset.index);
 
-            // --- ПРОВЕРКА НА ЗАНЯТОСТЬ ЯЧЕЙКИ ---
             if (gameState[clickedCellIndex] !== "" || !gameActive) {
                 return;
             }
-            // --- КОНЕЦ ПРОВЕРКИ ---
 
-            gameState[clickedCellIndex] = currentPlayer;
+            makeMove(clickedCellIndex);
+        }
 
-            // Получаем текущую тему, чтобы узнать, какой символ использовать
+        function makeMove(index) {
+            if (gameState[index] !== "" || !gameActive) {
+                return;
+            }
+
+            gameState[index] = currentPlayer;
+
             const currentTheme = themes[currentThemeKey];
             const markToShow = currentPlayer === 'X' ? currentTheme.marks.x : currentTheme.marks.o;
 
-            clickedCell.innerHTML = markToShow; // Вставляем кастомный символ
-            clickedCell.classList.add(currentPlayer.toLowerCase()); // Добавляем класс 'x' или 'o'
+            const cellElement = boardElement.children[index];
+            const playerMarkSpan = cellElement.querySelector('.player-mark');
+            const cellNumberSpan = cellElement.querySelector('.cell-number');
 
-            // Добавляем класс для "скучных уроков", чтобы применить специфичные стили
+            playerMarkSpan.textContent = markToShow;
+            cellElement.classList.add(currentPlayer.toLowerCase());
             if (currentThemeKey === 'boring-lessons') {
-                clickedCell.classList.add('boring-lessons');
+                cellElement.classList.add('boring-lessons');
+            }
+            // Скрыть номер после хода
+            if (cellNumberSpan) {
+                cellNumberSpan.style.opacity = '0';
             }
 
 
@@ -729,59 +1210,85 @@
             }
 
             const gameEndTime = new Date();
-            const gameDuration = Math.round((gameEndTime - gameStartTime) / 1000); // в секундах
+            const gameDuration = Math.round((gameEndTime - gameStartTime) / 1000);
 
             if (roundWon) {
-                statusDisplay.textContent = `Игрок ${currentPlayer} победил за ${gameDuration} сек!`;
-                 statusDisplay.style.color = root.style.getPropertyValue(currentPlayer === 'X' ? '--x-color' : '--o-color');
-                addHistoryRecord(`Игрок ${currentPlayer}`, gameDuration);
+                const playerWonText = currentPlayer === 'X' ? translations[currentLanguage].player_x_wins : translations[currentLanguage].player_o_wins;
+                statusDisplay.textContent = `${playerWonText} ${gameDuration} ${translations[currentLanguage].seconds}`;
+                statusDisplay.style.color = root.style.getPropertyValue(currentPlayer === 'X' ? '--x-color' : '--o-color');
+                addHistoryRecord(`${translations[currentLanguage]['player_' + currentPlayer.toLowerCase() + '_wins'].split(' ')[0]} ${currentPlayer}`, gameDuration);
                 gameActive = false;
                 return;
             }
 
             if (!gameState.includes("")) {
-                statusDisplay.textContent = `Ничья за ${gameDuration} сек!`;
-                statusDisplay.style.color = root.style.getPropertyValue('--text-color'); // Цвет ничьей из темы
-                addHistoryRecord('Ничья', gameDuration);
+                statusDisplay.textContent = `${translations[currentLanguage].draw} ${gameDuration} ${translations[currentLanguage].seconds}`;
+                statusDisplay.style.color = root.style.getPropertyValue('--text-color');
+                addHistoryRecord(translations[currentLanguage].draw, gameDuration);
                 gameActive = false;
                 return;
             }
 
             currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-            statusDisplay.textContent = `Ход игрока ${currentPlayer}`;
-             statusDisplay.style.color = root.style.getPropertyValue(currentPlayer === 'X' ? '--x-color' : '--o-color');
+            statusDisplay.textContent = `${translations[currentLanguage]['turn_' + currentPlayer.toLowerCase()]}`;
+            statusDisplay.style.color = root.style.getPropertyValue(currentPlayer === 'X' ? '--x-color' : '--o-color');
         }
 
         resetButtonGame.addEventListener('click', startGame);
+
+        // Обработчик нажатий клавиш для игры
+        document.addEventListener('keydown', (event) => {
+            // Проверяем, что активен экран игры
+            if (document.getElementById('gameScreen').classList.contains('active')) {
+                const keyPressed = parseInt(event.key);
+                if (keyPressed >= 1 && keyPressed <= 9) {
+                    const index = keyPressed - 1; // Номер ячейки 1-9 соответствует индексу 0-8
+                    makeMove(index);
+                }
+            }
+        });
+
 
         // --- История игр ---
         function addHistoryRecord(winner, duration) {
             const record = {
                 winner: winner,
                 duration: duration,
-                date: new Date().toLocaleString('ru-RU')
+                date: new Date().toLocaleString(currentLanguage === 'ru' ? 'ru-RU' : `${currentLanguage}-${currentLanguage.toUpperCase()}`)
             };
-            gameHistory.unshift(record); // Добавляем в начало
-            if (gameHistory.length > 20) { // Ограничиваем историю
+            gameHistory.unshift(record);
+            if (gameHistory.length > 20) {
                 gameHistory.pop();
             }
             localStorage.setItem('ticTacToeHistory', JSON.stringify(gameHistory));
         }
 
         function loadHistory() {
-            historyListElement.innerHTML = ''; // Очищаем список
+            historyListElement.innerHTML = '';
             if (gameHistory.length === 0) {
-                historyListElement.innerHTML = '<li>История пока пуста. Сыграйте партию!</li>';
+                historyListElement.innerHTML = `<li>${translations[currentLanguage].history_empty}</li>`;
                 return;
             }
             gameHistory.forEach(record => {
                 const listItem = document.createElement('li');
-                listItem.textContent = `${record.date} - ${record.winner}, Длительность: ${record.duration} сек.`;
+                listItem.textContent = `${record.date} - ${record.winner}, ${translations[currentLanguage].seconds.replace('!', '')}: ${record.duration} ${translations[currentLanguage].seconds.split(' ')[0]}.`;
                 historyListElement.appendChild(listItem);
             });
         }
 
-         // --- Управление Темами ---
+        // Кнопка очистки истории
+        clearHistoryButton.addEventListener('click', () => {
+            openModal('clearHistoryConfirmModal');
+        });
+
+        confirmClearHistoryButton.addEventListener('click', () => {
+            gameHistory = [];
+            localStorage.removeItem('ticTacToeHistory');
+            loadHistory();
+            closeModal('clearHistoryConfirmModal');
+        });
+
+        // --- Управление Темами ---
         function applyTheme(themeKey) {
             const theme = themes[themeKey];
             if (!theme) {
@@ -789,49 +1296,65 @@
                 return;
             }
 
-            // Применяем CSS переменные темы
             for (const [prop, value] of Object.entries(theme.vars)) {
                 root.style.setProperty(prop, value);
             }
 
-            // Сохраняем выбранную тему в localStorage
             localStorage.setItem('ticTacToeTheme', themeKey);
             currentThemeKey = themeKey;
 
-            // Обновляем активную тему в интерфейсе
-            updateThemesUI();
+            updateThemesUI(); // Обновляем UI тем
 
-            // Обновляем цвета в игровом поле, если оно активно
+            // Обновляем символы на доске, если игра активна или поле не пустое
             const cells = boardElement.children;
             for (let i = 0; i < cells.length; i++) {
                 const cell = cells[i];
-                cell.classList.remove('x', 'o', 'boring-lessons'); // Удаляем старые классы
-                if (gameState[i] !== "") { // Если ячейка не пустая
+                const playerMarkSpan = cell.querySelector('.player-mark');
+                const cellNumberSpan = cell.querySelector('.cell-number');
+
+                // Удаляем старые классы тем
+                cell.classList.remove('x', 'o', 'boring-lessons');
+
+                if (gameState[i] !== "") {
                     const player = gameState[i];
                     const markToShow = player === 'X' ? theme.marks.x : theme.marks.o;
-                    cell.innerHTML = markToShow;
+                    playerMarkSpan.textContent = markToShow;
                     cell.classList.add(player.toLowerCase());
                     if (currentThemeKey === 'boring-lessons') {
                          cell.classList.add('boring-lessons');
                      }
+                    // Скрываем номер, если символ уже установлен
+                    if (cellNumberSpan) {
+                        cellNumberSpan.style.opacity = '0';
+                    }
+                } else {
+                    // Если ячейка пуста, показываем номер и очищаем символ
+                    playerMarkSpan.textContent = '';
+                    if (cellNumberSpan) {
+                        cellNumberSpan.style.opacity = '1';
+                    }
                 }
             }
 
-
-            // Обновляем цвет статуса после смены темы (если находимся на игровом экране)
-             if (document.getElementById('gameScreen').classList.contains('active')) {
+            // Обновляем цвет статуса, если игра активна или завершена
+            if (document.getElementById('gameScreen').classList.contains('active')) {
                  if (gameActive) {
                      statusDisplay.style.color = root.style.getPropertyValue(currentPlayer === 'X' ? '--x-color' : '--o-color');
-                 } else if (statusDisplay.textContent.includes('победил')) {
-                      const winner = statusDisplay.textContent.includes('Игрок X') ? 'X' : 'O';
-                      statusDisplay.style.color = root.style.getPropertyValue(winner === 'X' ? '--x-color' : '--o-color');
-                 } else if (statusDisplay.textContent.includes('Ничья')) {
-                      statusDisplay.style.color = root.style.getPropertyValue('--text-color');
+                 } else { // Если игра завершена (победа/ничья)
+                    const statusText = statusDisplay.textContent;
+                    if (statusText.includes(translations[currentLanguage].player_x_wins.split(' ')[0])) {
+                        statusDisplay.style.color = root.style.getPropertyValue('--x-color');
+                    } else if (statusText.includes(translations[currentLanguage].player_o_wins.split(' ')[0])) {
+                        statusDisplay.style.color = root.style.getPropertyValue('--o-color');
+                    } else if (statusText.includes(translations[currentLanguage].draw.split(' ')[0])) {
+                        statusDisplay.style.color = root.style.getPropertyValue('--text-color');
+                    }
                  }
              }
         }
 
         function populateThemesGrid() {
+             eventThemesGridElement.innerHTML = '';
              ordinaryThemesGridElement.innerHTML = '';
              specialThemesGridElement.innerHTML = '';
 
@@ -843,21 +1366,20 @@
 
                  if (themeKey === currentThemeKey) {
                      optionDiv.classList.add('selected');
+                     if (theme.category === 'event') {
+                         optionDiv.classList.add('event-theme');
+                     }
                  }
 
                  const previewDiv = document.createElement('div');
                  previewDiv.classList.add('theme-preview');
-                 if (themeKey === 'boring-lessons') { // Добавляем спец. класс для стилей карандаша
+                 if (themeKey === 'boring-lessons') {
                      previewDiv.classList.add('boring-lessons');
                  }
 
-                 // Устанавливаем переменные для превью символов
                  previewDiv.style.setProperty('--preview-x-color', theme.preview['--preview-x-color']);
                  previewDiv.style.setProperty('--preview-o-color', theme.preview['--preview-o-color']);
 
-                 // Используем marks.x и marks.o для отображения в превью
-                 // Если это обычные X/O, то будут position:absolute
-                 // Если это цифры/эмодзи, то будут центрированы как textContent
                  const previewX = document.createElement('span');
                  previewX.classList.add('preview-x');
                  previewX.textContent = theme.marks.x;
@@ -871,7 +1393,8 @@
 
 
                  const nameSpan = document.createElement('span');
-                 nameSpan.textContent = theme.name;
+                 // Используем ключ для перевода названия темы
+                 nameSpan.textContent = translations[currentLanguage][theme.nameKey] || theme.nameKey;
 
                  optionDiv.appendChild(previewDiv);
                  optionDiv.appendChild(nameSpan);
@@ -880,7 +1403,9 @@
                      applyTheme(themeKey);
                  });
 
-                 if (theme.category === 'ordinary') {
+                 if (theme.category === 'event') {
+                     eventThemesGridElement.appendChild(optionDiv);
+                 } else if (theme.category === 'ordinary') {
                      ordinaryThemesGridElement.appendChild(optionDiv);
                  } else if (theme.category === 'special') {
                      specialThemesGridElement.appendChild(optionDiv);
@@ -889,29 +1414,201 @@
         }
 
         function updateThemesUI() {
-             const options = document.querySelectorAll('.theme-option'); // Ищем все опции тем
+             const options = document.querySelectorAll('.theme-option');
              options.forEach(option => {
+                 option.classList.remove('selected', 'event-theme');
                  if (option.dataset.themeKey === currentThemeKey) {
                      option.classList.add('selected');
-                 } else {
-                     option.classList.remove('selected');
+                     if (themes[currentThemeKey].category === 'event') {
+                         option.classList.add('event-theme');
+                     }
+                 }
+                 // Обновляем название темы, если оно есть в translations
+                 const themeKey = option.dataset.themeKey;
+                 const theme = themes[themeKey];
+                 if (theme && theme.nameKey) {
+                     option.querySelector('span:last-child').textContent = translations[currentLanguage][theme.nameKey] || theme.nameKey;
                  }
              });
          }
 
+        // --- Управление языками ---
+        function applyLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('ticTacToeLanguage', lang);
+            updateTextContent();
+            applyTheme(currentThemeKey); // Переприменяем тему, чтобы обновились символы на доске
+        }
+
+        function updateTextContent() {
+            document.getElementById('playButton').textContent = translations[currentLanguage].play;
+            document.getElementById('historyButton').textContent = translations[currentLanguage].history;
+            document.getElementById('themesButton').textContent = translations[currentLanguage].themes;
+            document.getElementById('settingsButton').textContent = translations[currentLanguage].settings;
+            document.getElementById('gameByText').textContent = translations[currentLanguage].game_by + ' ';
+
+            document.getElementById('gameTitle').textContent = translations[currentLanguage].game_title;
+            if (gameActive) {
+                statusDisplay.textContent = `${translations[currentLanguage]['turn_' + currentPlayer.toLowerCase()]}`;
+            } else {
+                // Если игра завершена, сохраняем текущий статус, но обновляем "секунды" и "победил/ничья"
+                const lastStatus = statusDisplay.textContent;
+                const durationMatch = lastStatus.match(/\d+/); // Находим число (длительность)
+                const duration = durationMatch ? parseInt(durationMatch[0]) : '';
+
+                if (lastStatus.includes('X победил') || lastStatus.includes('X won')) {
+                     statusDisplay.textContent = `${translations[currentLanguage].player_x_wins} ${duration} ${translations[currentLanguage].seconds}`;
+                } else if (lastStatus.includes('O победил') || lastStatus.includes('O won')) {
+                     statusDisplay.textContent = `${translations[currentLanguage].player_o_wins} ${duration} ${translations[currentLanguage].seconds}`;
+                } else if (lastStatus.includes('Ничья') || lastStatus.includes('Draw')) {
+                     statusDisplay.textContent = `${translations[currentLanguage].draw} ${duration} ${translations[currentLanguage].seconds}`;
+                }
+            }
+
+
+            document.getElementById('resetButtonGame').textContent = translations[currentLanguage].start_new;
+            document.getElementById('backToMenuGame').textContent = translations[currentLanguage].back_to_menu;
+
+            document.getElementById('historyTitle').textContent = translations[currentLanguage].history_title;
+            document.getElementById('clearHistoryButton').textContent = translations[currentLanguage].clear_history;
+            document.getElementById('backToMenuHistory').textContent = translations[currentLanguage].back_to_menu;
+
+            document.getElementById('themesTitle').textContent = translations[currentLanguage].themes_title;
+            document.getElementById('eventThemesTitle').textContent = translations[currentLanguage].event_themes;
+            document.getElementById('ordinaryThemesTitle').textContent = translations[currentLanguage].ordinary_themes;
+            document.getElementById('specialThemesTitle').textContent = translations[currentLanguage].special_themes;
+            document.getElementById('backToMenuThemes').textContent = translations[currentLanguage].back_to_menu;
+
+            document.getElementById('settingsTitle').textContent = translations[currentLanguage].settings_title;
+            document.getElementById('languageSettingsTitle').textContent = translations[currentLanguage].language;
+            currentLanguageDisplay.textContent = languageNames[currentLanguage];
+            document.getElementById('supportButton').textContent = translations[currentLanguage].write_to_support;
+            document.getElementById('applySettingsButton').textContent = translations[currentLanguage].apply;
+            document.getElementById('backToMenuSettings').textContent = translations[currentLanguage].back_to_menu;
+
+            // Модальные окна
+            languageModalTitle.textContent = translations[currentLanguage].select_your_language;
+
+            document.getElementById('clearHistoryConfirmTitle').textContent = translations[currentLanguage].confirm_clear_history;
+            document.getElementById('confirmClearHistoryButton').textContent = translations[currentLanguage].yes_clear;
+            document.querySelector('#clearHistoryConfirmModal .back-button').textContent = translations[currentLanguage].cancel;
+
+            document.getElementById('cancelSettingsConfirmTitle').textContent = translations[currentLanguage].confirm_cancel_settings;
+            document.getElementById('cancelSettingsStayButton').textContent = translations[currentLanguage].cancel;
+            document.getElementById('cancelSettingsDiscardButton').textContent = translations[currentLanguage].discard;
+
+
+            // Обновляем список истории, так как текст там тоже меняется
+            if (document.getElementById('historyScreen').classList.contains('active')) {
+                loadHistory();
+            }
+            // Обновляем названия тем в сетке тем
+            if (document.getElementById('themesScreen').classList.contains('active')) {
+                populateThemesGrid();
+            }
+        }
+
+
+        function populateLanguageOptions(container, selectedLang, onClickHandler) {
+            container.innerHTML = '';
+            for (const langCode in languageNames) {
+                const langOption = document.createElement('div');
+                langOption.classList.add('language-option');
+                if (langCode === selectedLang) {
+                    langOption.classList.add('selected-lang');
+                }
+                langOption.dataset.lang = langCode;
+                langOption.textContent = languageNames[langCode];
+                langOption.addEventListener('click', () => {
+                    onClickHandler(langCode);
+                    Array.from(container.children).forEach(child => child.classList.remove('selected-lang'));
+                    langOption.classList.add('selected-lang');
+                });
+                container.appendChild(langOption);
+            }
+        }
+
+        // --- Модальные окна ---
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'none';
+        }
+
+        // --- Логика настроек ---
+        let originalSettingsLanguage = currentLanguage;
+
+        applySettingsButton.addEventListener('click', () => {
+            applyLanguage(tempSettingsLanguage);
+            originalSettingsLanguage = tempSettingsLanguage;
+            showScreen('mainMenuScreen');
+        });
+
+        function confirmCancelSettings() {
+            if (tempSettingsLanguage !== originalSettingsLanguage) {
+                openModal('cancelSettingsConfirmModal');
+            } else {
+                showScreen('mainMenuScreen');
+            }
+        }
+
+        cancelSettingsStayButton.addEventListener('click', () => {
+            closeModal('cancelSettingsConfirmModal');
+            populateLanguageOptions(settingsLanguageOptionsContainer, tempSettingsLanguage, (lang) => {
+                tempSettingsLanguage = lang;
+                currentLanguageDisplay.textContent = languageNames[tempSettingsLanguage];
+            });
+        });
+
+        cancelSettingsDiscardButton.addEventListener('click', () => {
+            closeModal('cancelSettingsConfirmModal');
+            tempSettingsLanguage = originalSettingsLanguage;
+            showScreen('mainMenuScreen');
+            applyLanguage(originalSettingsLanguage);
+        });
+
+        supportButton.addEventListener('click', () => {
+            window.location.href = 'mailto:unluckymoderator@gmail.com';
+        });
+
 
         // --- Инициализация ---
-        // Загружаем сохраненную тему при загрузке страницы
-        applyTheme(localStorage.getItem('ticTacToeTheme') || 'default');
+        function init() {
+            const hasChosenLanguage = localStorage.getItem('ticTacToeLanguageChosen');
+            if (!hasChosenLanguage) {
+                showScreen('mainMenuScreen');
+                openModal('languageModal');
+                // Заголовок модального окна выбора языка
+                languageModalTitle.textContent = translations['ru'].select_your_language + ' / ' +
+                                                  translations['en'].select_your_language + ' / ' +
+                                                  translations['es'].select_your_language + ' / ' +
+                                                  translations['pt'].select_your_language + ' / ' +
+                                                  translations['it'].select_your_language;
 
-        // Заполняем сетку тем при первом показе или загрузке страницы
-         populateThemesGrid();
+                populateLanguageOptions(firstTimeLanguageOptions, null, (lang) => {
+                    applyLanguage(lang);
+                    localStorage.setItem('ticTacToeLanguageChosen', 'true');
+                    closeModal('languageModal');
+                    // showScreen('mainMenuScreen'); // Уже установлен как активный
+                });
+            } else {
+                applyLanguage(currentLanguage); // Применяем сохраненный язык
+                showScreen('mainMenuScreen'); // Показываем главное меню
+            }
 
+            // Загружаем сохраненную тему при загрузке страницы
+            applyTheme(localStorage.getItem('ticTacToeTheme') || 'default');
+            populateThemesGrid();
+        }
 
-        // --- Регистрация Service Worker для PWA (сохранено) ---
+        // --- Регистрация Service Worker для PWA ---
         if ('serviceWorker' in navigator) {
           window.addEventListener('load', function() {
-            navigator.serviceWorker.register('/service-worker.js') // Путь к файлу Service Worker
+            navigator.serviceWorker.register('/service-worker.js')
               .then(registration => {
                 console.log('Service Worker успешно зарегистрирован:', registration);
               })
@@ -920,6 +1617,9 @@
               });
           });
         }
+
+        // Запуск инициализации при загрузке DOM
+        document.addEventListener('DOMContentLoaded', init);
 
     </script>
 </body>
