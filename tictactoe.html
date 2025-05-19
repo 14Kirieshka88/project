@@ -3,17 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Крестики-Нолики (Эффект "RTX")</title>
+    <title>Крестики-Нолики Deluxe</title>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1f2937">
+
     <style>
         :root {
-            --board-bg: #2c3e50; /* Темно-сине-серый */
-            --cell-bg: #34495e; /* Чуть светлее */
-            --cell-hover-bg: #4a627a;
-            --x-color: #e74c3c; /* Ярко-красный */
-            --o-color: #3498db; /* Ярко-синий */
-            --text-color: #ecf0f1; /* Светло-серый */
-            --border-color: #7f8c8d; /* Серый для линий */
-            --shadow-color: rgba(0, 0, 0, 0.5);
+            --main-bg: #1f2937; /* Темно-серый */
+            --container-bg: #374151; /* Средне-серый */
+            --button-bg: #4f46e5; /* Ярко-фиолетовый */
+            --button-hover-bg: #6366f1;
+            --x-color: #ef4444; /* Ярко-красный */
+            --o-color: #3b82f6; /* Ярко-синий */
+            --text-color: #f3f4f6; /* Очень светло-серый */
+            --border-color: #6b7280; /* Серый для линий */
+            --shadow-color: rgba(0, 0, 0, 0.6);
             --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
@@ -24,71 +29,95 @@
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            background: linear-gradient(135deg, #1a1a1a 0%, #333333 100%);
+            background: linear-gradient(135deg, #111827 0%, var(--main-bg) 100%);
             font-family: var(--font-family);
             color: var(--text-color);
-            overflow: hidden; /* Предотвращает появление полос прокрутки от теней */
+            overflow: hidden;
         }
 
-        .game-container {
-            display: flex;
+        .screen {
+            display: none; /* Скрываем все экраны по умолчанию */
             flex-direction: column;
             align-items: center;
-            padding: 20px;
-            background-color: rgba(0,0,0,0.2);
+            justify-content: center;
+            width: 90%;
+            max-width: 500px;
+            padding: 25px;
+            background-color: var(--container-bg);
             border-radius: 20px;
-            box-shadow: 0 15px 30px var(--shadow-color), 0 0 80px rgba(var(--x-color-rgb, 231, 76, 60), 0.3), 0 0 80px rgba(var(--o-color-rgb, 52, 152, 219), 0.3);
+            box-shadow: 0 20px 40px var(--shadow-color);
+            text-align: center;
         }
 
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 20px;
+        .screen.active {
+            display: flex; /* Показываем активный экран */
+        }
+
+        h1, h2 {
             color: var(--text-color);
-            text-shadow: 0 0 10px var(--x-color), 0 0 20px var(--o-color);
+            text-shadow: 0 0 8px rgba(255,255,255,0.3);
+        }
+        h1 { font-size: 2.8em; margin-bottom: 30px; }
+        h2 { font-size: 2em; margin-bottom: 20px; }
+
+
+        .menu-button, .back-button {
+            background-color: var(--button-bg);
+            color: var(--text-color);
+            border: none;
+            border-radius: 10px;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+            width: 250px;
+            text-align: center;
         }
 
+        .menu-button:hover, .back-button:hover {
+            background-color: var(--button-hover-bg);
+            transform: translateY(-3px);
+        }
+
+        /* Стили для игрового поля (адаптированы из предыдущего кода) */
         .board {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            width: 330px; /* Увеличено для более "премиального" вида */
-            height: 330px;
-            gap: 10px; /* Промежутки между ячейками */
-            background-color: var(--board-bg);
-            padding: 10px;
-            border-radius: 15px;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.5), 0 5px 15px var(--shadow-color);
+            width: 300px;
+            height: 300px;
+            gap: 8px;
+            background-color: var(--main-bg);
+            padding: 8px;
+            border-radius: 12px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.4), 0 3px 8px var(--shadow-color);
+            margin-bottom: 20px;
         }
 
         .cell {
-            background-color: var(--cell-bg);
-            border-radius: 10px; /* Скругленные углы для ячеек */
+            background-color: var(--container-bg); /* Темнее, чем фон контейнера игры */
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 4em; /* Размер X и O */
+            font-size: 3.5em;
             font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3) inset, 0 1px 2px rgba(255,255,255,0.1);
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2) inset, 0 1px 1px rgba(255,255,255,0.05);
         }
 
         .cell:hover {
-            background-color: var(--cell-hover-bg);
-            transform: scale(1.03);
+            background-color: #4b5563; /* Чуть светлее при наведении */
         }
 
-        .cell.x {
-            color: var(--x-color);
-            text-shadow: 0 0 8px var(--x-color), 0 0 15px var(--x-color), 0 0 3px black; /* Эффект свечения */
-        }
+        .cell.x { color: var(--x-color); text-shadow: 0 0 7px var(--x-color), 0 0 3px black; }
+        .cell.o { color: var(--o-color); text-shadow: 0 0 7px var(--o-color), 0 0 3px black; }
 
-        .cell.o {
-            color: var(--o-color);
-            text-shadow: 0 0 8px var(--o-color), 0 0 15px var(--o-color), 0 0 3px black; /* Эффект свечения */
-        }
-
-        /* Анимация появления X и O */
         .cell.x::before, .cell.o::before {
             opacity: 0;
             transform: scale(0.5);
@@ -98,76 +127,109 @@
         .cell.o::before { content: 'O'; }
 
         @keyframes appear {
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+            to { opacity: 1; transform: scale(1); }
         }
-
 
         .status {
-            margin-top: 25px;
-            font-size: 1.5em;
-            min-height: 1.5em; /* Резервируем место, чтобы не прыгало */
-            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+            min-height: 1.4em;
         }
 
-        button#resetButton {
-            margin-top: 20px;
+        button#resetButtonGame { /* Переименована для уникальности */
+            background: linear-gradient(145deg, var(--x-color), var(--o-color));
+            /* Прочие стили как у menu-button */
+            color: var(--text-color);
+            border: none;
+            border-radius: 10px;
             padding: 12px 25px;
             font-size: 1.1em;
             font-weight: bold;
-            color: var(--text-color);
-            background: linear-gradient(145deg, var(--x-color), var(--o-color));
-            border: none;
-            border-radius: 8px;
+            margin-top:10px;
             cursor: pointer;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             box-shadow: 0 4px 8px var(--shadow-color);
         }
-
-        button#resetButton:hover {
-            transform: translateY(-2px) scale(1.05);
+        button#resetButtonGame:hover {
+            transform: translateY(-2px) scale(1.02);
             box-shadow: 0 6px 12px var(--shadow-color);
         }
 
-        button#resetButton:active {
-            transform: translateY(0px) scale(1);
-            box-shadow: 0 2px 4px var(--shadow-color);
-        }
 
         .audio-controls {
-            margin-top: 30px;
+            margin-top: 20px;
         }
         audio {
             border-radius: 25px;
             border: 1px solid var(--border-color);
             box-shadow: 0 2px 5px var(--shadow-color);
+            width: 100%;
+            max-width: 300px;
         }
 
-        /* Анимация для фона */
+        /* История игр */
+        #historyList {
+            list-style: none;
+            padding: 0;
+            width: 100%;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        #historyList li {
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: #4b5563;
+        }
+        #historyList li:last-child {
+            border-bottom: none;
+        }
+        #historyList li:nth-child(odd) {
+            background-color: var(--container-bg);
+        }
+
+        /* Настройки - Динозавр */
+        .dino-builder {
+            font-family: monospace;
+            white-space: pre;
+            font-size: 1.2em; /* Размер дино можно подстроить */
+            line-height: 1;
+            color: #2ecc71; /* Зеленый дино */
+            margin: 20px 0;
+            padding:10px;
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            background-color: rgba(0,0,0,0.2);
+        }
+        .settings-message {
+            font-size: 1.3em;
+            margin-top: 10px;
+            color: #f1c40f; /* Желтый для сообщения */
+        }
+
+        /* Анимация фона (если нужна) */
         @keyframes gradientShift {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-
-        body {
-            background: linear-gradient(270deg, #1a1a1a, #2c3e50, #3498db, #e74c3c);
-            background-size: 800% 800%; /* Увеличенный размер для плавной анимации */
-            animation: gradientShift 25s ease infinite;
+        body { /* Переопределяем фон для анимации */
+            background: linear-gradient(270deg, #000000, #111827, var(--button-bg), #1f2937);
+            background-size: 600% 600%;
+            animation: gradientShift 30s ease infinite;
         }
 
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <h1>Крестики-Нолики</h1>
-        <div class="board" id="board">
-            </div>
-        <div class="status" id="status">Ход игрока X</div>
-        <button id="resetButton">Начать заново</button>
 
+    <div id="mainMenuScreen" class="screen active">
+        <h1>Крестики-Нолики Deluxe</h1>
+        <button class="menu-button" onclick="showScreen('gameScreen'); startGame();">Играть</button>
+        <button class="menu-button" onclick="showScreen('historyScreen'); loadHistory();">История игр</button>
+        <button class="menu-button" onclick="showScreen('settingsScreen')">Настройки</button>
         <div class="audio-controls">
             <audio id="backgroundMusic" controls loop>
                 <source src="music.mp3" type="audio/mpeg">
@@ -176,43 +238,92 @@
         </div>
     </div>
 
-    <script>
-        const board = document.getElementById('board');
-        const statusDisplay = document.getElementById('status');
-        const resetButton = document.getElementById('resetButton');
-        const backgroundMusic = document.getElementById('backgroundMusic');
+    <div id="gameScreen" class="screen">
+        <h2>Крестики-Нолики</h2>
+        <div class="status" id="status">Ход игрока X</div>
+        <div class="board" id="board">
+            </div>
+        <button id="resetButtonGame">Начать заново</button>
+        <button class="back-button" onclick="showScreen('mainMenuScreen')">В меню</button>
+    </div>
 
+    <div id="historyScreen" class="screen">
+        <h2>История побед</h2>
+        <ul id="historyList">
+            </ul>
+        <button class="back-button" onclick="showScreen('mainMenuScreen')">В меню</button>
+    </div>
+
+    <div id="settingsScreen" class="screen">
+        <h2>Настройки</h2>
+        <div class="dino-builder">
+          /\_/\
+         / o o \
+        (  (_Y_)  )
+         \ \   / / Я строитель!
+          \ '-' /  []--[]
+           '---'  [][][]
+        </div>
+        <p class="settings-message">Простите, я случайно все сломал... <br>(Настройки в разработке!)</p>
+        <button class="back-button" onclick="showScreen('mainMenuScreen')">В меню</button>
+    </div>
+
+    <script>
+        // Элементы DOM
+        const screens = document.querySelectorAll('.screen');
+        const boardElement = document.getElementById('board');
+        const statusDisplay = document.getElementById('status');
+        const resetButtonGame = document.getElementById('resetButtonGame');
+        const backgroundMusic = document.getElementById('backgroundMusic');
+        const historyListElement = document.getElementById('historyList');
+
+        // Состояние игры
         let currentPlayer = 'X';
         let gameActive = true;
-        let gameState = ["", "", "", "", "", "", "", "", ""]; // 9 ячеек
+        let gameState = ["", "", "", "", "", "", "", "", ""];
+        let gameStartTime;
+        let gameHistory = JSON.parse(localStorage.getItem('ticTacToeHistory')) || [];
 
         const winningConditions = [
-            [0, 1, 2], [3, 4, 5], [6, 7, 8], // Горизонтали
-            [0, 3, 6], [1, 4, 7], [2, 5, 8], // Вертикали
-            [0, 4, 8], [2, 4, 6]  // Диагонали
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6]
         ];
 
-        const xColorRGB = "231, 76, 60"; // Для тени контейнера
-        const oColorRGB = "52, 152, 219"; // Для тени контейнера
-        document.documentElement.style.setProperty('--x-color-rgb', xColorRGB);
-        document.documentElement.style.setProperty('--o-color-rgb', oColorRGB);
+        // --- Управление экранами ---
+        function showScreen(screenId) {
+            screens.forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+            // Попытка воспроизвести музыку, если она не играет и пользователь переходит в меню
+            if (screenId === 'mainMenuScreen' && backgroundMusic.paused) {
+                 // Используйте play() только после действия пользователя, чтобы избежать блокировки
+                 // backgroundMusic.play().catch(e => console.log("Music autoplay prevented: " + e));
+                 // Для PWA часто музыку начинают воспроизводить после первого клика на "Играть"
+            }
+        }
 
-
-        function createBoard() {
-            board.innerHTML = ''; // Очищаем доску перед созданием
+        // --- Логика игры ---
+        function startGame() {
+            boardElement.innerHTML = ''; // Очищаем доску
             gameState = ["", "", "", "", "", "", "", "", ""];
             currentPlayer = 'X';
             gameActive = true;
             statusDisplay.textContent = `Ход игрока ${currentPlayer}`;
-            statusDisplay.style.color = currentPlayer === 'X' ? 'var(--x-color)' : 'var(--o-color)';
-
+            statusDisplay.style.color = 'var(--x-color)';
+            gameStartTime = new Date();
 
             for (let i = 0; i < 9; i++) {
                 const cell = document.createElement('div');
                 cell.classList.add('cell');
                 cell.dataset.index = i;
                 cell.addEventListener('click', handleCellClick);
-                board.appendChild(cell);
+                boardElement.appendChild(cell);
+            }
+             // Воспроизводим музыку при старте игры (после клика "Играть")
+            if (backgroundMusic.paused) {
+                 backgroundMusic.play().catch(e => console.log("Music play failed: " + e));
             }
         }
 
@@ -225,9 +336,13 @@
             }
 
             gameState[clickedCellIndex] = currentPlayer;
-            // clickedCell.textContent = currentPlayer; // Заменено на ::before для анимации
+            // clickedCell.textContent = currentPlayer; // Заменено
+            clickedCell.innerHTML = ''; // Очистить содержимое перед добавлением псевдоэлемента
+            const playerMark = document.createElement('span'); // Создаем span для ::before
+            playerMark.textContent = currentPlayer;
+            clickedCell.appendChild(playerMark); // Добавляем span, чтобы сработал ::before
             clickedCell.classList.add(currentPlayer.toLowerCase());
-            // clickedCell.style.color = currentPlayer === 'X' ? 'var(--x-color)' : 'var(--o-color)'; // Теперь через классы
+
 
             checkResult();
         }
@@ -239,27 +354,28 @@
                 let a = gameState[winCondition[0]];
                 let b = gameState[winCondition[1]];
                 let c = gameState[winCondition[2]];
-                if (a === '' || b === '' || c === '') {
-                    continue;
-                }
+                if (a === '' || b === '' || c === '') continue;
                 if (a === b && b === c) {
                     roundWon = true;
                     break;
                 }
             }
 
+            const gameEndTime = new Date();
+            const gameDuration = Math.round((gameEndTime - gameStartTime) / 1000); // в секундах
+
             if (roundWon) {
-                statusDisplay.textContent = `Игрок ${currentPlayer} победил!`;
+                statusDisplay.textContent = `Игрок ${currentPlayer} победил за ${gameDuration} сек!`;
                 statusDisplay.style.color = currentPlayer === 'X' ? 'var(--x-color)' : 'var(--o-color)';
+                addHistoryRecord(`Игрок ${currentPlayer}`, gameDuration);
                 gameActive = false;
-                // Попытка запустить музыку при победе (может быть заблокирована браузером)
-                // backgroundMusic.play().catch(e => console.log("Autoplay prevented: " + e));
                 return;
             }
 
             if (!gameState.includes("")) {
-                statusDisplay.textContent = `Ничья!`;
+                statusDisplay.textContent = `Ничья за ${gameDuration} сек!`;
                 statusDisplay.style.color = 'var(--text-color)';
+                addHistoryRecord('Ничья', gameDuration);
                 gameActive = false;
                 return;
             }
@@ -269,19 +385,51 @@
             statusDisplay.style.color = currentPlayer === 'X' ? 'var(--x-color)' : 'var(--o-color)';
         }
 
-        resetButton.addEventListener('click', createBoard);
+        resetButtonGame.addEventListener('click', startGame);
 
-        // Инициализация доски при загрузке
-        createBoard();
+        // --- История игр ---
+        function addHistoryRecord(winner, duration) {
+            const record = {
+                winner: winner,
+                duration: duration,
+                date: new Date().toLocaleString('ru-RU')
+            };
+            gameHistory.unshift(record); // Добавляем в начало
+            if (gameHistory.length > 20) { // Ограничиваем историю
+                gameHistory.pop();
+            }
+            localStorage.setItem('ticTacToeHistory', JSON.stringify(gameHistory));
+        }
 
-        // Попытка автозапуска музыки (может быть заблокировано браузером)
-        // Для надежного автозапуска часто требуется взаимодействие пользователя со страницей.
-        // Если вы хотите, чтобы музыка играла сразу, уберите // из строки ниже,
-        // но будьте готовы, что это может не сработать во всех браузерах без клика пользователя.
-        // backgroundMusic.play().catch(e => {
-        //    console.log("Autoplay was prevented. User interaction might be needed to play music.");
-        //    // Можно добавить кнопку "Включить музыку", если автоплей не сработал.
-        // });
+        function loadHistory() {
+            historyListElement.innerHTML = ''; // Очищаем список
+            if (gameHistory.length === 0) {
+                historyListElement.innerHTML = '<li>История пока пуста. Сыграйте партию!</li>';
+                return;
+            }
+            gameHistory.forEach(record => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${record.date} - ${record.winner}, Длительность: ${record.duration} сек.`;
+                historyListElement.appendChild(listItem);
+            });
+        }
+
+        // --- Инициализация ---
+        // По умолчанию показываем главное меню - уже установлено в HTML классом active
+
+        // --- Регистрация Service Worker для PWA ---
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/service-worker.js') // Путь к файлу Service Worker
+              .then(registration => {
+                console.log('Service Worker успешно зарегистрирован:', registration);
+              })
+              .catch(error => {
+                console.log('Ошибка регистрации Service Worker:', error);
+              });
+          });
+        }
+
     </script>
 </body>
 </html>
