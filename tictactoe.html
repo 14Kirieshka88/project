@@ -366,11 +366,12 @@
         #versionInfo {
             margin-top: 20px;
             font-size: 1em;
-            color: rgba(255, 255, 255, 0.6); /* Прозрачно-беловатый */
+            color: rgba(255, 255, 255, 0.6); /* Прозрачно-беловатый (по умолчанию) */
             text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
             display: flex;
             flex-direction: column;
             gap: 5px; /* Отступ между строками */
+            transition: color 0.3s ease; /* Плавный переход цвета */
         }
 
         /* --- Стили для модальных окон --- */
@@ -902,6 +903,7 @@
         const specialThemesGridElement = document.querySelector('#specialThemes .themes-grid');
         const eventThemesGridElement = document.querySelector('#eventThemes .themes-grid');
         const root = document.documentElement;
+        const versionInfoElement = document.getElementById('versionInfo'); // Получаем элемент versionInfo
 
         const languageModal = document.getElementById('languageModal');
         const languageModalTitle = document.getElementById('languageModalTitle');
@@ -1453,12 +1455,12 @@
                     '--text-color': '#333333',
                     '--border-color': '#cccccc',
                     '--shadow-color': 'rgba(0, 0, 0, 0.2)',
-                    '--body-bg-start': 'transparent', /* Прозрачный, чтобы не накладывался на изображение */
+                    '--body-bg-start': 'transparent', 
                     '--body-bg-end': 'transparent',
                     '--body-bg-direction': '135deg',
-                    '--body-bg-size': 'cover', /* Фон покрывает всю область */
+                    '--body-bg-size': 'cover', 
                     '--body-bg-animation': 'none',
-                    '--body-bg-image': 'url("bg.jpg")', /* Используем изображение */
+                    '--body-bg-image': 'url("bg.jpg")', 
                     '--body-bg-repeat': 'no-repeat',
                     '--body-bg-position': 'center center',
                  },
@@ -1528,12 +1530,12 @@
                     '--text-color': '#333333',
                     '--border-color': '#cccccc',
                     '--shadow-color': 'rgba(0, 0, 0, 0.2)',
-                    '--body-bg-start': 'transparent', /* Прозрачный, чтобы не накладывался на изображение */
+                    '--body-bg-start': 'transparent', 
                     '--body-bg-end': 'transparent',
                     '--body-bg-direction': '135deg',
-                    '--body-bg-size': 'cover', /* Фон покрывает всю область */
+                    '--body-bg-size': 'cover', 
                     '--body-bg-animation': 'none',
-                    '--body-bg-image': 'url("bg.jpg")', /* Используем изображение */
+                    '--body-bg-image': 'url("bg.jpg")', 
                     '--body-bg-repeat': 'no-repeat',
                     '--body-bg-position': 'center center',
                  },
@@ -1580,27 +1582,19 @@
             });
             document.getElementById(screenId).classList.add('active');
 
-            // Управление стеком предыдущих экранов
             if (pushToStack && currentActiveScreen && currentActiveScreen !== screenId) {
                  previousScreenStack.push(currentActiveScreen);
              }
             currentActiveScreen = screenId;
 
-
-            // Сброс игры при переходе на другие экраны
-            // Этот блок нужно обновить, чтобы он срабатывал только при выходе из gameScreen
-            // или при явном запросе на сброс
             if (screenId === 'gameScreen') {
                 if (resetGame || !gameActive || (currentBoardWidth !== initialBoardSize.width || currentBoardHeight !== initialBoardSize.height)) {
                     startGame(currentBoardWidth, currentBoardHeight);
                 }
             } else if (currentActiveScreen === 'gameScreen' && screenId !== 'gameScreen') {
-                // Если уходим с игрового экрана, сбрасываем игру до дефолтного состояния
-                startGame(3, 3); // Сбрасываем к 3x3 по умолчанию при выходе
+                startGame(3, 3); 
             }
 
-
-            // Если переходим на экран настроек, обновляем список языков
             if (screenId === 'settingsScreen') {
                 populateLanguageOptions(settingsLanguageOptionsContainer, tempSettingsLanguage, (lang) => {
                     tempSettingsLanguage = lang;
@@ -1610,21 +1604,18 @@
             if (screenId === 'themesScreen') {
                  populateThemesGrid();
             }
-            // Обновляем текст при смене экрана
             updateTextContent();
-            // Обновляем размер доски на экране выбора, если это boardSizeSelectionScreen
             if (screenId === 'boardSizeSelectionScreen') {
                 updateBoardSizeDisplay();
             }
         }
 
-        // Функция для возврата на предыдущий экран
         function goBack() {
             if (previousScreenStack.length > 0) {
                 const prevScreenId = previousScreenStack.pop();
-                showScreen(prevScreenId, false, false); // false, чтобы не добавлять текущий экран в стек снова
+                showScreen(prevScreenId, false, false); 
             } else {
-                showScreen('mainMenuScreen', false, false); // Если стек пуст, возвращаемся в главное меню
+                showScreen('mainMenuScreen', false, false); 
             }
         }
 
@@ -1632,10 +1623,10 @@
         function startGame(width = 3, height = 3) {
             currentBoardWidth = width;
             currentBoardHeight = height;
-            initialBoardSize = { width: width, height: height }; // Обновляем начальный размер
+            initialBoardSize = { width: width, height: height }; 
 
-            boardElement.innerHTML = ''; // Очищаем доску
-            gameState = Array(width * height).fill(""); // Инициализируем gameState под новый размер
+            boardElement.innerHTML = ''; 
+            gameState = Array(width * height).fill(""); 
             currentPlayer = 'X';
             gameActive = true;
             statusDisplay.textContent = `${translations[currentLanguage].turn_x}`;
@@ -1643,12 +1634,10 @@
 
             gameStartTime = new Date();
 
-            // Устанавливаем свойства grid для доски
             boardElement.style.gridTemplateColumns = `repeat(${width}, 1fr)`;
             boardElement.style.gridTemplateRows = `repeat(${height}, 1fr)`;
 
-            // Оптимизируем размер доски под размер экрана
-            const maxBoardDimension = Math.min(window.innerWidth * 0.8, window.innerHeight * 0.6, 500); // 80% ширины, 60% высоты, не более 500px
+            const maxBoardDimension = Math.min(window.innerWidth * 0.8, window.innerHeight * 0.6, 500); 
             const cellSize = maxBoardDimension / Math.max(width, height);
             boardElement.style.width = `${cellSize * width}px`;
             boardElement.style.height = `${cellSize * height}px`;
@@ -1658,28 +1647,26 @@
                 const cell = document.createElement('div');
                 cell.classList.add('cell');
                 cell.dataset.index = i;
-                cell.dataset.cellNumber = i + 1; // Добавляем номер ячейки
+                cell.dataset.cellNumber = i + 1; 
                 cell.addEventListener('click', handleCellClick);
 
                 const playerMarkSpan = document.createElement('span');
                 playerMarkSpan.classList.add('player-mark');
-                // playerMarkSpan.textContent будет установлен в handleCellClick
-
+                
                 const cellNumberSpan = document.createElement('span');
                 cellNumberSpan.classList.add('cell-number');
-                cellNumberSpan.textContent = i + 1; // Номер для отображения
+                cellNumberSpan.textContent = i + 1; 
                 
                 cell.appendChild(playerMarkSpan);
-                cell.appendChild(cellNumberSpan); // Добавляем номер в ячейку
+                cell.appendChild(cellNumberSpan); 
                 
                 boardElement.appendChild(cell);
             }
-            // Переприменяем тему, чтобы символы были правильными
             applyTheme(currentThemeKey);
         }
 
         function handleCellClick(event) {
-            const clickedCell = event.target.closest('.cell'); // Убедимся, что клик был по ячейке
+            const clickedCell = event.target.closest('.cell'); 
             if (!clickedCell) return;
 
             const clickedCellIndex = parseInt(clickedCell.dataset.index);
@@ -1710,7 +1697,6 @@
             if (currentThemeKey === 'boring-lessons') {
                 cellElement.classList.add('boring-lessons');
             }
-            // Скрыть номер после хода
             if (cellNumberSpan) {
                 cellNumberSpan.style.opacity = '0';
             }
@@ -1719,11 +1705,9 @@
             checkResult();
         }
 
-        // Функция для проверки победы на доске произвольного размера
         function checkWin(width, height) {
             const board = gameState;
 
-            // Проверка по горизонтали
             for (let r = 0; r < height; r++) {
                 for (let c = 0; c <= width - 3; c++) {
                     const idx = r * width + c;
@@ -1733,7 +1717,6 @@
                 }
             }
 
-            // Проверка по вертикали
             for (let c = 0; c < width; c++) {
                 for (let r = 0; r <= height - 3; r++) {
                     const idx = r * width + c;
@@ -1743,7 +1726,6 @@
                 }
             }
 
-            // Проверка по диагонали (сверху-влево на снизу-вправо)
             for (let r = 0; r <= height - 3; r++) {
                 for (let c = 0; c <= width - 3; c++) {
                     const idx = r * width + c;
@@ -1753,7 +1735,6 @@
                 }
             }
 
-            // Проверка по диагонали (сверху-вправо на снизу-влево)
             for (let r = 0; r <= height - 3; r++) {
                 for (let c = 2; c < width; c++) {
                     const idx = r * width + c;
@@ -1779,6 +1760,9 @@
                 statusDisplay.style.color = root.style.getPropertyValue(currentPlayer === 'X' ? '--x-color' : '--o-color');
                 addHistoryRecord(`${translations[currentLanguage]['player_' + currentPlayer.toLowerCase() + '_wins'].split(' ')[0]} ${currentPlayer}`, gameDuration, `${currentBoardWidth}x${currentBoardHeight}`);
                 gameActive = false;
+                
+                new Audio('winner.mp3').play(); 
+
                 return;
             }
 
@@ -1797,14 +1781,12 @@
 
         resetButtonGame.addEventListener('click', () => startGame(currentBoardWidth, currentBoardHeight));
 
-        // Обработчик нажатий клавиш для игры
         document.addEventListener('keydown', (event) => {
-            // Проверяем, что активен экран игры
             if (document.getElementById('gameScreen').classList.contains('active')) {
                 const keyPressed = parseInt(event.key);
-                if (keyPressed >= 1 && keyPressed <= 9) { // Пока только для 3x3
-                    const index = keyPressed - 1; // Номер ячейки 1-9 соответствует индексу 0-8
-                    if (index < gameState.length) { // Учитываем размер доски
+                if (keyPressed >= 1 && keyPressed <= 9) { 
+                    const index = keyPressed - 1; 
+                    if (index < gameState.length) { 
                         makeMove(index);
                     }
                 }
@@ -1817,7 +1799,7 @@
             const record = {
                 winner: winner,
                 duration: duration,
-                boardSize: boardSize, // Добавляем размер доски
+                boardSize: boardSize, 
                 date: new Date().toLocaleString(currentLanguage === 'ru' ? 'ru-RU' : `${currentLanguage}-${currentLanguage.toUpperCase()}`)
             };
             gameHistory.unshift(record);
@@ -1840,7 +1822,6 @@
             });
         }
 
-        // Кнопка очистки истории
         clearHistoryButton.addEventListener('click', () => {
             openModal('clearHistoryConfirmModal');
         });
@@ -1867,16 +1848,26 @@
             localStorage.setItem('ticTacToeTheme', themeKey);
             currentThemeKey = themeKey;
 
-            updateThemesUI(); // Обновляем UI тем
+            // Изменяем цвет текста versionInfo в зависимости от темы
+            if (versionInfoElement) { // Убедимся, что элемент существует
+                if (themeKey === 'excellent-poor' || themeKey === 'boring-lessons') {
+                    versionInfoElement.style.color = 'rgba(0, 0, 0, 0.7)'; // Темный цвет для светлых тем
+                    versionInfoElement.style.textShadow = '0 0 3px rgba(0,0,0,0.1)';
+                } else {
+                    versionInfoElement.style.color = 'rgba(255, 255, 255, 0.6)'; // Светлый цвет для темных тем
+                    versionInfoElement.style.textShadow = '0 0 5px rgba(255,255,255,0.2)';
+                }
+            }
 
-            // Обновляем символы на доске, если игра активна или поле не пустое
+
+            updateThemesUI(); 
+
             const cells = boardElement.children;
             for (let i = 0; i < cells.length; i++) {
                 const cell = cells[i];
                 const playerMarkSpan = cell.querySelector('.player-mark');
                 const cellNumberSpan = cell.querySelector('.cell-number');
 
-                // Удаляем старые классы тем
                 cell.classList.remove('x', 'o', 'boring-lessons');
 
                 if (gameState[i] !== "") {
@@ -1887,12 +1878,10 @@
                     if (currentThemeKey === 'boring-lessons') {
                          cell.classList.add('boring-lessons');
                      }
-                    // Скрываем номер, если символ уже установлен
                     if (cellNumberSpan) {
                         cellNumberSpan.style.opacity = '0';
                     }
                 } else {
-                    // Если ячейка пуста, показываем номер и очищаем символ
                     playerMarkSpan.textContent = '';
                     if (cellNumberSpan) {
                         cellNumberSpan.style.opacity = '1';
@@ -1900,11 +1889,10 @@
                 }
             }
 
-            // Обновляем цвет статуса, если игра активна или завершена
             if (document.getElementById('gameScreen').classList.contains('active')) {
                  if (gameActive) {
                      statusDisplay.style.color = root.style.getPropertyValue(currentPlayer === 'X' ? '--x-color' : '--o-color');
-                 } else { // Если игра завершена (победа/ничья)
+                 } else { 
                     const statusText = statusDisplay.textContent;
                     if (statusText.includes(translations[currentLanguage].player_x_wins.split(' ')[0])) {
                         statusDisplay.style.color = root.style.getPropertyValue('--x-color');
@@ -1937,12 +1925,10 @@
 
                  const previewDiv = document.createElement('div');
                  previewDiv.classList.add('theme-preview');
-                 // Применяем класс boring-lessons к превью, если это тема boring-lessons
                  if (themeKey === 'boring-lessons') {
                      previewDiv.classList.add('boring-lessons');
                  }
 
-                 // Устанавливаем цвета для превью X и O из темы
                  previewDiv.style.setProperty('--preview-x-color', theme.preview['--preview-x-color']);
                  previewDiv.style.setProperty('--preview-o-color', theme.preview['--preview-o-color']);
 
@@ -1959,7 +1945,6 @@
 
 
                  const nameSpan = document.createElement('span');
-                 // Используем ключ для перевода названия темы
                  nameSpan.textContent = translations[currentLanguage][theme.nameKey] || theme.nameKey;
 
                  optionDiv.appendChild(previewDiv);
@@ -1989,26 +1974,21 @@
                          option.classList.add('event-theme');
                      }
                  }
-                 // Обновляем название темы, если оно есть в translations
                  const themeKey = option.dataset.themeKey;
                  const theme = themes[themeKey];
                  if (theme && theme.nameKey) {
                      option.querySelector('span:last-child').textContent = translations[currentLanguage][theme.nameKey] || theme.nameKey;
                  }
 
-                 // Убедимся, что превью обновляется при смене темы
                  const previewDiv = option.querySelector('.theme-preview');
                  const previewX = option.querySelector('.preview-x');
                  const previewO = option.querySelector('.preview-o');
 
-                 // Удаляем и добавляем класс boring-lessons
                  previewDiv.classList.toggle('boring-lessons', themeKey === 'boring-lessons');
 
-                 // Обновляем текстовое содержимое символов превью
                  previewX.textContent = themes[themeKey].marks.x;
                  previewO.textContent = themes[themeKey].marks.o;
 
-                 // Обновляем цвета символов превью, если они заданы в theme.preview
                  previewDiv.style.setProperty('--preview-x-color', themes[themeKey].preview['--preview-x-color']);
                  previewDiv.style.setProperty('--preview-o-color', themes[themeKey].preview['--preview-o-color']);
              });
@@ -2019,7 +1999,7 @@
             currentLanguage = lang;
             localStorage.setItem('ticTacToeLanguage', lang);
             updateTextContent();
-            applyTheme(currentThemeKey); // Переприменяем тему, чтобы обновились символы на доске
+            applyTheme(currentThemeKey); 
         }
 
         function updateTextContent() {
@@ -2033,12 +2013,10 @@
             if (gameActive) {
                 statusDisplay.textContent = `${translations[currentLanguage]['turn_' + currentPlayer.toLowerCase()]}`;
             } else {
-                // Если игра завершена, сохраняем текущий статус, но обновляем "секунды" и "победил/ничья"
                 const lastStatus = statusDisplay.textContent;
-                const durationMatch = lastStatus.match(/\d+/); // Находим число (длительность)
+                const durationMatch = lastStatus.match(/\d+/); 
                 const duration = durationMatch ? parseInt(durationMatch[0]) : '';
 
-                // Проверяем, какой язык был использован в последнем статусе, и соответствующим образом обновляем
                 let winnerSymbol = '';
                 if (lastStatus.includes(translations['ru'].player_x_wins.split(' ')[0]) || lastStatus.includes(translations['en'].player_x_wins.split(' ')[0]) ||
                     lastStatus.includes(translations['es'].player_x_wins.split(' ')[0]) || lastStatus.includes(translations['pt'].player_x_wins.split(' ')[0]) ||
@@ -2082,7 +2060,6 @@
             document.getElementById('applySettingsButton').textContent = translations[currentLanguage].apply;
             document.getElementById('backToMenuSettings').textContent = translations[currentLanguage].back_to_menu;
 
-            // Модальные окна
             languageModalTitle.textContent = translations[currentLanguage].select_your_language;
 
             document.getElementById('clearHistoryConfirmTitle').textContent = translations[currentLanguage].confirm_clear_history;
@@ -2093,7 +2070,6 @@
             document.getElementById('cancelSettingsStayButton').textContent = translations[currentLanguage].cancel;
             document.getElementById('cancelSettingsDiscardButton').textContent = translations[currentLanguage].discard;
 
-            // Новые элементы для выбора игры
             document.getElementById('selectGameModeTitle').textContent = translations[currentLanguage].select_game_mode;
             document.getElementById('ticTacToeButton').textContent = translations[currentLanguage].tic_tac_toe;
             document.getElementById('ticTacToeBlastButton').textContent = translations[currentLanguage].tic_tac_toe_blast;
@@ -2114,13 +2090,11 @@
             cancelGameCreationStayButton.textContent = translations[currentLanguage].continue_creation;
             cancelGameCreationDiscardButton.textContent = translations[currentLanguage].abort_creation;
 
-            // Обновляем список истории, так как текст там тоже меняется
             if (document.getElementById('historyScreen').classList.contains('active')) {
                 loadHistory();
             }
-            // Обновляем названия тем в сетке тем
             if (document.getElementById('themesScreen').classList.contains('active')) {
-                populateThemesGrid(); // Это перезаполнит сетку и обновит названия тем
+                populateThemesGrid(); 
             }
         }
 
@@ -2144,7 +2118,6 @@
             }
         }
 
-        // --- Модальные окна ---
         function openModal(modalId) {
             const modal = document.getElementById(modalId);
             modal.style.display = 'flex';
@@ -2160,7 +2133,6 @@
             openModal('notificationModal');
         }
 
-        // --- Логика настроек ---
         let originalSettingsLanguage = currentLanguage;
 
         applySettingsButton.addEventListener('click', () => {
@@ -2196,7 +2168,6 @@
             window.location.href = 'mailto:unluckymoderator@gmail.com';
         });
 
-        // --- Логика выбора игры ---
         playButton.addEventListener('click', () => showScreen('gameModeSelectionScreen'));
 
         ticTacToeButton.addEventListener('click', () => showScreen('gamePlayModeSelectionScreen'));
@@ -2210,7 +2181,6 @@
         playViaWifiButton.addEventListener('click', () => showNotification('network_under_development'));
         playViaBluetoothButton.addEventListener('click', () => showNotification('network_under_development'));
 
-        // Логика выбора размера доски
         function updateBoardSizeDisplay() {
             currentBoardSizeDisplay.textContent = `${currentBoardWidth}x${currentBoardHeight}`;
         }
@@ -2240,18 +2210,16 @@
             }
             currentBoardWidth = width;
             currentBoardHeight = height;
-            currentBoardSizeDisplay.textContent = `${currentBoardWidth}x${currentBoardHeight}`; // Обновляем дисплей
-            // Очищаем поля после успешного создания
+            currentBoardSizeDisplay.textContent = `${currentBoardWidth}x${currentBoardHeight}`; 
             customWidthInput.value = '';
             customHeightInput.value = '';
         });
 
         startGameFinalButton.addEventListener('click', () => {
-            showScreen('gameScreen', true); // Начинаем игру с выбранным размером
+            showScreen('gameScreen', true); 
         });
 
 
-        // Логика подтверждения отмены создания игры
         let currentScreenBeforeCancel = '';
         function confirmCancelGameCreation(screenToReturn) {
             currentScreenBeforeCancel = screenToReturn;
@@ -2260,12 +2228,10 @@
 
         cancelGameCreationStayButton.addEventListener('click', () => {
             closeModal('cancelGameCreationConfirmModal');
-            // Остаемся на текущем экране, который вызвал модалку
         });
 
         cancelGameCreationDiscardButton.addEventListener('click', () => {
             closeModal('cancelGameCreationConfirmModal');
-            // Возвращаемся в главное меню
             showScreen('mainMenuScreen');
         });
 
@@ -2274,9 +2240,8 @@
         function init() {
             const hasChosenLanguage = localStorage.getItem('ticTacToeLanguageChosen');
             if (!hasChosenLanguage) {
-                showScreen('mainMenuScreen'); // Показываем главное меню, чтобы PWA сразу запустилось
+                showScreen('mainMenuScreen'); 
                 openModal('languageModal');
-                // Заголовок модального окна выбора языка
                 languageModalTitle.textContent = translations['ru'].select_your_language + ' / ' +
                                                   translations['en'].select_your_language + ' / ' +
                                                   translations['es'].select_your_language + ' / ' +
@@ -2287,20 +2252,17 @@
                     applyLanguage(lang);
                     localStorage.setItem('ticTacToeLanguageChosen', 'true');
                     closeModal('languageModal');
-                    // showScreen('mainMenuScreen'); // Уже установлен как активный
                 });
             } else {
-                applyLanguage(currentLanguage); // Применяем сохраненный язык
-                showScreen('mainMenuScreen'); // Показываем главное меню
+                applyLanguage(currentLanguage); 
+                showScreen('mainMenuScreen'); 
             }
 
-            // Загружаем сохраненную тему при загрузке страницы
             applyTheme(localStorage.getItem('ticTacToeTheme') || 'default');
-            populateThemesGrid(); // Вызываем здесь, чтобы сетка тем правильно отрисовалась при старте
-            startGame(currentBoardWidth, currentBoardHeight); // Инициализируем доску 3x3 при первом запуске
+            populateThemesGrid(); 
+            startGame(currentBoardWidth, currentBoardHeight); 
         }
 
-        // --- Регистрация Service Worker для PWA ---
         if ('serviceWorker' in navigator) {
           window.addEventListener('load', function() {
             navigator.serviceWorker.register('/service-worker.js')
@@ -2313,13 +2275,10 @@
           });
         }
 
-        // Запуск инициализации при загрузке DOM
         document.addEventListener('DOMContentLoaded', init);
 
-        // Обновление размеров доски при изменении размера окна
         window.addEventListener('resize', () => {
             if (document.getElementById('gameScreen').classList.contains('active') && gameActive) {
-                // Если игра активна, перерисовываем доску с текущим размером
                 startGame(currentBoardWidth, currentBoardHeight);
             }
         });
